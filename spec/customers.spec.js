@@ -143,9 +143,7 @@ describe('Customers', () => {
       BrandibbleRef.customers.update({ last_name: newLastName }, 5).catch(response => {
         let errors = shouldError(response);
         expect(errors).to.have.lengthOf(1);
-        // TODO: Waiting on JC's update here: 
-        //expect(errors[0]).to.have.property('code', 'customers.update.token_mismatch');
-        expect(errors[0]).to.have.property('code', 'customers.show.token_mismatch');
+        expect(errors[0]).to.have.property('code', 'customers.update.token_mismatch');
         done();
       });
     });
