@@ -2,6 +2,7 @@ const webpack = require('webpack');
 
 module.exports = {  
   entry: [
+    'whatwg-fetch',
     './lib/Brandibble'
   ],
   output: {

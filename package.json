@@ -1,12 +1,12 @@
 {
   "name": "brandibble",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "API Wrapper for Brandibble.co",
   "repository": "https://github.com/sanctuarycomputer/brandibble.js",
-  "main": "dist/Brandibble.js",
+  "main": "lib/Brandibble.js",
   "scripts": {
     "build": "weback",
-    "test": "webpack; mocha spec/brandibble.spec.js"
+    "test": "webpack; karma start"
   },
   "author": "Hugh Francis <me@hughfrancis.me> (http://hughfrancis.me/)",
   "license": "MIT",
@@ -15,6 +15,12 @@
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-mocha": "^1.0.1",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
     "mocha": "^2.5.3",
     "webpack": "^1.13.1"
   },

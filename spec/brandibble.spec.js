@@ -1,5 +1,5 @@
-var expect = require('chai').expect;
-var Brandibble = require('..').default;
+import { expect } from 'chai';
+import Brandibble from '..';
 
 // Test Helpers
 function seedEmail() {
@@ -7,7 +7,7 @@ function seedEmail() {
 }
 
 // Init Brandibble Session for Testing
-var BrandibbleInstance = new Brandibble({
+var BrandibbleRef = new Brandibble({
   apiKey: 'c2FuY3R1YXJ5IGNvbXB1dGVy',
   brandId: 6,
   apiEndpoint: 'http://unsecure.brandibble.co/api/'
@@ -15,25 +15,32 @@ var BrandibbleInstance = new Brandibble({
 
 // Brandibble Wrapper
 describe('Brandibble', () => {
-  it('exists', () => expect(BrandibbleInstance).to.exist);
+  it('exists', () => expect(BrandibbleRef).to.exist);
 
   it('sets private variables', () => {
-    expect(BrandibbleInstance.__apiEndpoint).to.be.a('string');
-    expect(BrandibbleInstance.__apiEndpoint).to.equal('https://www.brandibble.co/api/');
+    expect(BrandibbleRef).to.have.property('Adapter');
+    let Adapter = BrandibbleRef.Adapter;
+    expect(Adapter).to.have.property('apiKey', 'c2FuY3R1YXJ5IGNvbXB1dGVy');
+    expect(Adapter).to.have.property('apiBase', 'http://unsecure.brandibble.co/api/v1/brands/6/');
+  });
+});
 
-    expect(BrandibbleInstance.__apiBase).to.be.a('string');
-    expect(BrandibbleInstance.__apiBase).to.equal('https://www.brandibble.co/api/v1/brands/6/');
+describe('Brandibble.Adapter', () => {
+  it('builds the correct headers', () => {
+    let headers = BrandibbleRef.Adapter.headers();
+    expect(headers).to.have.property('Content-Type', 'application/json');
+    expect(headers).to.have.property('Brandibble-Api-Key', 'c2FuY3R1YXJ5IGNvbXB1dGVy');
   });
 });
 
 // Customers
 describe('Brandibble.Customers', () => {
-  it('exists', () => { expect(BrandibbleInstance.Customers).to.exist });
+  it('exists', () => { expect(BrandibbleRef.Customers).to.exist });
 
-  it('stores the customer token', () => { expect(BrandibbleInstance.Customers.customerToken).to.exist });
-
-  it('can create a customer', () => {
-    BrandibbleInstance.Customers.create({
+  //it('stores the customer token', () => { expect(BrandibbleInstance.Customers.customerToken).to.exist });
+  
+  it('can create a customer', done => {
+    BrandibbleRef.Customers.create({
       first_name: 'Sanctuary',
       last_name: 'Testing',
       email: seedEmail(),
@@ -45,11 +52,25 @@ describe('Brandibble.Customers', () => {
       expect(response).to.have.property('first_name');
       expect(response).to.have.property('last_name');
       expect(response).to.have.property('phone');
+      done();
+    });
+  });
+
+  it('fails with bad inputs', done => {
+    BrandibbleRef.Customers.create({
+      first_name: 'Sanctuary',
+      last_name: 'Testing',
+      email: 'nope',
+      password: 'password'
+    }).catch(error => {
+      // TODO
+      done();
     });
   });
 });
 
-// Locations
+/* Locations
 describe('Brandibble.Locations', () => {
   it('exists', () => { expect(BrandibbleInstance.Locations).to.exist });
 });
+*/
