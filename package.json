@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "API Wrapper for Brandibble.co",
   "repository": "https://github.com/sanctuarycomputer/brandibble.js",
-  "main": "lib/brandibble.js",
+  "main": "dist/brandibble.js",
   "scripts": {
     "build": "weback",
     "test": "webpack; karma start"

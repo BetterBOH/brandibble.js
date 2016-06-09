@@ -3,11 +3,11 @@ const webpack = require('webpack');
 module.exports = {  
   entry: [
     'whatwg-fetch',
-    './lib/Brandibble'
+    './lib/brandibble'
   ],
   output: {
     path: __dirname + '/dist',
-    filename: "Brandibble.js",
+    filename: "brandibble.js",
     libraryTarget: 'umd'
   },
   module: {

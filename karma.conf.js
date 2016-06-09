@@ -13,8 +13,7 @@ module.exports = function (config) {
       'karma-chai',
       'karma-mocha',
       'karma-sourcemap-loader',
-      'karma-webpack',
-      'karma-htmlfile-reporter'
+      'karma-webpack'
     ],
     preprocessors: {
       'spec/**/*.spec.js': [ 'webpack', 'sourcemap' ] 
