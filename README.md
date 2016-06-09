@@ -6,7 +6,7 @@ fetch library).
 
 ### Usage
 
-```
+```js
 import Brandibble from 'brandibble';
 
 // Build a global Brandibble Ref
