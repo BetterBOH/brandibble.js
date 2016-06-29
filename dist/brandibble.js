@@ -515,11 +515,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _customers2 = _interopRequireDefault(_customers);
 
+	var _Locations = __webpack_require__(11);
+
+	var _Locations2 = _interopRequireDefault(_Locations);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	//import Locations from './Locations';
 
 	var Brandibble = function Brandibble(_ref) {
 	  var apiKey = _ref.apiKey;
@@ -546,6 +548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /* Build Resources */
 	  this.customers = new _customers2.default(this.adapter);
+	  this.locations = new _Locations2.default(this.adapter);
 	};
 
 	exports.default = Brandibble;
@@ -1928,6 +1931,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = Customers;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Locations = function () {
+	  function Locations(adapter) {
+	    _classCallCheck(this, Locations);
+
+	    this.adapter = adapter;
+	  }
+
+	  _createClass(Locations, [{
+	    key: 'index',
+	    value: function index() {
+	      return this.adapter.request('GET', 'locations');
+	    }
+	  }, {
+	    key: 'menu',
+	    value: function menu(locationId) {
+	      return this.adapter.request('GET', 'locations/' + locationId + '/menu');
+	    }
+	  }]);
+
+	  return Locations;
+	}();
+
+	exports.default = Locations;
 
 /***/ }
 /******/ ])

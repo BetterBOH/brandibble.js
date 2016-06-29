@@ -1,7 +1,6 @@
 import { buildRef } from './helpers';
 let BrandibbleRef = buildRef();
-/* Locations
-describe('Brandibble.Locations', () => {
-  it('exists', () => { expect(BrandibbleInstance.Locations).to.exist });
+
+describe('Locations', () => {
+  it('exists', () => { expect(BrandibbleInstance.locations).to.exist });
 });
-*/
