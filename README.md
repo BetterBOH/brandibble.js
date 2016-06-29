@@ -29,7 +29,7 @@ Brandibble.customers.create({
   return BrandibbleRef.customers.authenticate({ response.email, password });
 });
 
-// Now your client will be authenticated (that state is persisted over 
+// Now your client will be authenticated (that state is persisted over
 // page refreshes in localStorage), which you can check like so:
 
 let isAuthenticated = !!BrandibbleRef.adapter.customerToken;
@@ -46,16 +46,18 @@ Brandibble.customers.current().then(currentCustomer => {
 
 **A note on statefulness:**
 
-Brandibble.JS provides a slew of both stateful (dependent on the adapter's state), and stateless 
+Brandibble.JS provides a slew of both stateful (dependent on the adapter's state), and stateless
 (simple, 'dumb' methods).  It's totally up to the developer how to use these - but generally the
 stateful methods are simply composed of a few stateless methods.
 
+---
 ##### Adapter
 
 Used for serializing and deserializing JSON, and making requests.  The adapter is also responsible
 for restoring data from LocalStorage (or Cookies, for Safari Private Browsing).  Check the object
 for more info (lib/adapter.js).
 
+---
 ##### Customers
 
 *Stateful Methods*
@@ -68,11 +70,36 @@ for more info (lib/adapter.js).
 
   - `Brandibble.customers.create({ email, password, first_name, last_name, phone })`
   - `Brandibble.customers.resetPassword({ email })`
-  - `Brandibble.customers.token({ email, password })` 
+  - `Brandibble.customers.token({ email, password })`
       - Not necessary with `authenticate`.
-  - `Brandibble.customers.show(customerId)` 
+  - `Brandibble.customers.show(customerId)`
       - Not necessary with `current`.
   - `Brandibble.customers.update({ email, password, first_name, last_name, phone }, customerId)`
       - Not necessary with `updateCurrent`.
 
+---
+##### Addresses
 
+All Address Methods are dependent on the authenticated customer (stateful).
+
+*Stateful Methods*
+
+  - `Brandibble.addresses.all()`
+  - `Brandibble.create(AddressObject)`
+
+      Your address object should look something like this:
+
+      ```
+      let AddressObject = {
+        street_address: '110 Bowery',
+        unit: '4 FL',
+        city: 'New York',
+        state_code: 'NY',
+        zip_code: 10013,
+        latitude: 40.755912,
+        longitude: -73.9709333,
+        company: 'Sanctuary Computer, Inc.',
+        contact_name: 'Hugh Francis',
+        contact_phone: '5512213610'
+      }
+      ```

@@ -519,6 +519,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Locations2 = _interopRequireDefault(_Locations);
 
+	var _addresses = __webpack_require__(12);
+
+	var _addresses2 = _interopRequireDefault(_addresses);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -549,6 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /* Build Resources */
 	  this.customers = new _customers2.default(this.adapter);
 	  this.locations = new _Locations2.default(this.adapter);
+	  this.addresses = new _addresses2.default(this.adapter);
 	};
 
 	exports.default = Brandibble;
@@ -1969,6 +1974,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = Locations;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Addresses = function () {
+	  function Addresses(adapter) {
+	    _classCallCheck(this, Addresses);
+
+	    this.adapter = adapter;
+	  }
+
+	  _createClass(Addresses, [{
+	    key: 'all',
+	    value: function all() {
+	      return this.adapter.request('GET', 'customers/' + this.adapter.customerId() + '/addresses');
+	    }
+	  }, {
+	    key: 'create',
+	    value: function create(body) {
+	      return this.adapter.request('POST', 'customers/' + this.adapter.customerId() + '/addresses', body);
+	    }
+	  }]);
+
+	  return Addresses;
+	}();
+
+	exports.default = Addresses;
 
 /***/ }
 /******/ ])
