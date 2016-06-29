@@ -80,7 +80,7 @@ for more info (lib/adapter.js).
 ---
 ##### Addresses
 
-All Address Methods are dependent on their being an authenticated customer.
+All Address Methods are dependent on the authenticated customer (stateful).
 
 *Stateful Methods*
 
