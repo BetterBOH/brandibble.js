@@ -1,11 +1,6 @@
-import { buildRef } from './helpers';
+import { buildRef, TestingUser } from './helpers';
 let BrandibbleRef = buildRef();
 
 before(done => {
-  BrandibbleRef.customers.create({
-    first_name: 'Sanctuary',
-    last_name: 'Testing',
-    email: 'sanctuary-testing-customer@example.com',
-    password: 'password'
-  }).then(() => done()).catch(() => done());
+  BrandibbleRef.customers.create(TestingUser).then(() => done()).catch(() => done());
 });
