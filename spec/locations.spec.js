@@ -1,4 +1,4 @@
-import { buildRef, shouldSucceed } from './helpers';
+import { buildRef, shouldSucceed, shouldError } from './helpers';
 let BrandibbleRef = buildRef();
 
 describe('Locations', () => {
@@ -8,6 +8,7 @@ describe('Locations', () => {
     BrandibbleRef.locations.index().then(response => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
+      done();
     });
   });
 
@@ -15,10 +16,20 @@ describe('Locations', () => {
     BrandibbleRef.locations.index().then(response => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
-      BrandibbleRef.locations.show(data[0].location_id).then(response => {
-        debugger;
-
+      BrandibbleRef.locations.menu(data[0].location_id).then(response => {
+        let data = shouldSucceed(response);
+        expect(data).to.be.a('array');
+        done();
       });
+    });
+  });
+
+  it('fails to show a menu for a location that does not exist', done => {
+    BrandibbleRef.locations.menu(9999999999999).catch(response => {
+      let errors = shouldError(response);
+      expect(errors).to.be.a('array');
+      expect(errors[0].code).to.equal('locations.validate.id_not_found');
+      done();
     });
   });
 

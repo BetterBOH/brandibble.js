@@ -103,3 +103,8 @@ All Address Methods are dependent on the authenticated customer (stateful).
         contact_phone: '5512213610'
       }
       ```
+---
+##### Locations
+
+  - `Brandibble.locations.index()`
+  - `Brandibble.locations.menu(locationId)`
