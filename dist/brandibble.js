@@ -2056,7 +2056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var service_type = arguments.length <= 1 || arguments[1] === undefined ? 'delivery' : arguments[1];
 
 	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
-	      return this.adapter.request('POST', '/menus', { location_id: location_id, service_type: service_type, requested_at: requested_at });
+	      return this.adapter.request('POST', 'menus', { location_id: location_id, service_type: service_type, requested_at: requested_at });
 	    }
 	  }]);
 
