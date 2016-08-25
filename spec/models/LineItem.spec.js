@@ -27,7 +27,7 @@ describe('LineItem', () => {
     let sides = lineItem.optionGroups()[1];
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
-    expect(lineItem.format()).to.have.keys(['id', 'made_for', 'instructions', 'price', 'quantity', 'option_groups']);
+    expect(lineItem.format()).to.contain.all.keys(['id', 'made_for', 'instructions', 'price', 'quantity', 'option_groups']);
   });
 
   it('it can not violate an option rule', () => {

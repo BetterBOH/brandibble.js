@@ -72,10 +72,8 @@ describe('Orders', () => {
         return configureTestingOrder(customer, address, card)
           .then(Brandibble.orders.submit.bind(Brandibble.orders))
           .then(response => {
-            debugger;
+            expect(response).to.be.true
             done();
-          }).catch(response => {
-            debugger;
           });
       });
     });

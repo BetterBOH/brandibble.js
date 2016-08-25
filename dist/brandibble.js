@@ -533,15 +533,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _orders2 = _interopRequireDefault(_orders);
 
-	var _cards = __webpack_require__(15);
-
-	var _cards2 = _interopRequireDefault(_cards);
-
-	var _order = __webpack_require__(16);
+	var _order = __webpack_require__(15);
 
 	var _order2 = _interopRequireDefault(_order);
 
-	var _lineItem = __webpack_require__(19);
+	var _lineItem = __webpack_require__(18);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -584,7 +580,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.addresses = new _addresses2.default(this.adapter);
 	  this.menus = new _menus2.default(this.adapter);
 	  this.orders = new _orders2.default(this.adapter);
-	  this.cards = new _cards2.default(this.adapter);
 
 	  /* Misc */
 	  this.TestCreditCards = _utils.TestCreditCards;
@@ -2159,26 +2154,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 15 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Cards = function Cards(adapter) {
-	  _classCallCheck(this, Cards);
-
-	  this.adapter = adapter;
-	};
-
-	exports.default = Cards;
-
-/***/ },
-/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2189,7 +2164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _cart5 = __webpack_require__(17);
+	var _cart5 = __webpack_require__(16);
 
 	var _cart6 = _interopRequireDefault(_cart5);
 
@@ -2379,7 +2354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Order;
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2390,11 +2365,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(18);
+	var _lodash = __webpack_require__(17);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _lineItem = __webpack_require__(19);
+	var _lineItem = __webpack_require__(18);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -2472,7 +2447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Cart;
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -19086,10 +19061,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -19099,7 +19074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(18);
+	var _lodash = __webpack_require__(17);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -19116,18 +19091,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.product = product;
 	    this.quantity = quantity;
 	    this.configuration = [];
-	    this.madeFor = null;
-	    this.instructions = null;
+	    this.madeFor = "";
+	    this.instructions = "";
 	  }
 
 	  _createClass(LineItem, [{
-	    key: 'configurationForGroup',
+	    key: "configurationForGroup",
 	    value: function configurationForGroup(groupOrId) {
-	      var optionGroupId = (typeof groupOrId === 'undefined' ? 'undefined' : _typeof(groupOrId)) === "object" ? groupOrId.id : parseInt(groupOrId);
+	      var optionGroupId = (typeof groupOrId === "undefined" ? "undefined" : _typeof(groupOrId)) === "object" ? groupOrId.id : parseInt(groupOrId);
 	      return _lodash2.default.find(this.configuration, { optionGroupId: optionGroupId });
 	    }
 	  }, {
-	    key: 'addOption',
+	    key: "addOption",
 	    value: function addOption(group, item) {
 	      var groupConfig = this.configurationForGroup(group);
 	      var canAdd = group.max_options > (groupConfig ? groupConfigoptionItems.length : 0);
@@ -19153,7 +19128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return true;
 	    }
 	  }, {
-	    key: 'removeOption',
+	    key: "removeOption",
 	    value: function removeOption(item) {
 	      var groupConfig = this.configurationForGroup(item.group_id);
 	      if (groupConfig) {
@@ -19164,22 +19139,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return groupConfig;
 	    }
 	  }, {
-	    key: 'isValid',
+	    key: "isValid",
 	    value: function isValid() {
 	      return this.errors().length === 0;
 	    }
 	  }, {
-	    key: 'hasOptionGroups',
+	    key: "hasOptionGroups",
 	    value: function hasOptionGroups() {
 	      return this.optionGroups().length > 0;
 	    }
 	  }, {
-	    key: 'optionGroups',
+	    key: "optionGroups",
 	    value: function optionGroups() {
 	      return this.product.option_groups || [];
 	    }
 	  }, {
-	    key: 'errors',
+	    key: "errors",
 	    value: function errors() {
 	      var _this = this;
 
@@ -19206,20 +19181,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }).compact().value();
 	    }
 	  }, {
-	    key: 'format',
+	    key: "format",
 	    value: function format() {
 	      return {
 	        id: this.product.id,
 	        made_for: this.madeFor,
 	        instructions: this.instructions,
-	        price: this.product.price,
 	        quantity: this.quantity,
+	        // below doesnt make sense
+	        price: this.product.price,
+	        category_id: this.product.category_id,
+	        name: this.product.name,
 	        option_groups: _lodash2.default.map(this.configuration, function (g) {
 	          return {
 	            id: g.optionGroupId,
 	            option_items: _lodash2.default.map(g.optionItems, function (oi) {
 	              return {
 	                id: oi.id,
+	                // This shoulndt b passed
+	                name: oi.name,
 	                price: oi.price
 	              };
 	            })
