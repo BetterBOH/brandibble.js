@@ -533,11 +533,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _orders2 = _interopRequireDefault(_orders);
 
-	var _order = __webpack_require__(15);
+	var _cards = __webpack_require__(15);
+
+	var _cards2 = _interopRequireDefault(_cards);
+
+	var _order = __webpack_require__(16);
 
 	var _order2 = _interopRequireDefault(_order);
 
-	var _lineItem = __webpack_require__(18);
+	var _lineItem = __webpack_require__(19);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -580,6 +584,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.addresses = new _addresses2.default(this.adapter);
 	  this.menus = new _menus2.default(this.adapter);
 	  this.orders = new _orders2.default(this.adapter);
+	  this.cards = new _cards2.default(this.adapter);
+
+	  /* Misc */
+	  this.TestCreditCards = _utils.TestCreditCards;
 	};
 
 	exports.default = Brandibble;
@@ -593,6 +601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.TestCreditCards = undefined;
 	exports.applyPollyfills = applyPollyfills;
 	exports.persist = persist;
 	exports.retrieve = retrieve;
@@ -679,6 +688,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    console.warn('Brandibble.js: Local Storage is not availble,\n        and therefore the client can\'t retrieve information over page refresh.');
 	  }
 	}
+
+	var TestCreditCards = exports.TestCreditCards = {
+	  visa: [{ response: 'approval', number: '4788250000121443' }, { response: 'refer_call', number: '4387751111111020' }, { response: 'do_not_honor', number: '4387751111111038' }, { response: 'card_expired', number: '4387751111111046' }, { response: 'insufficient_funds', number: '43877511111110531' }],
+	  mastercard: [{ response: 'approval', number: '5454545454545454' }, { response: 'refer_call', number: '5442981111111023' }, { response: 'do_not_honor', number: '5442981111111031' }, { response: 'card_expired', number: '5442981111111049' }, { response: 'insufficient_funds', number: '5442981111111056' }],
+	  amex: [{ response: 'approval', number: '371449635398431' }],
+	  discover: [{ response: 'approval', number: '6011000995500000' }, { response: 'refer_call', number: '6011000995511122' }, { response: 'do_not_honor', number: '6011000995511130' }, { response: 'card_expired', number: '6011000995511148' }, { response: 'insufficient_funds', number: '6011000995511155' }]
+	};
 
 /***/ },
 /* 4 */
@@ -2122,35 +2138,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'validate',
 	    value: function validate(orderObj) {
 	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
-	      var body = orderObj.format();
+	      var body = orderObj.formatForValidation();
 	      body.requested_at = requested_at;
 	      return this.adapter.request('POST', 'orders/validate', body);
 	    }
 	  }, {
-	    key: 'create',
-	    value: function create(location_id) {
-	      var service_type = arguments.length <= 1 || arguments[1] === undefined ? 'delivery' : arguments[1];
-	      var address = arguments[2];
-	      var cart = arguments[3];
-	      var customer = arguments[4];
-	      var options = arguments.length <= 5 || arguments[5] === undefined ? defaultOptions : arguments[5];
-
+	    key: 'submit',
+	    value: function submit(orderObj) {
 	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
-
-	      var include_utensils = options.include_utensils;
-	      var notes_for_store = options.notes_for_store;
-	      var payment_type = options.payment_type;
-	      var tip = options.tip;
-
-
-	      return this.adapter.request('POST', '/orders/create', {
-	        location_id: location_id,
-	        service_type: service_type,
-	        requested_at: requested_at,
-	        cart: cart,
-	        address: address,
-	        customer: customer
-	      });
+	      var body = orderObj.format();
+	      body.requested_at = requested_at;
+	      return this.adapter.request('POST', 'orders/create', body);
 	    }
 	  }]);
 
@@ -2161,6 +2159,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 15 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Cards = function Cards(adapter) {
+	  _classCallCheck(this, Cards);
+
+	  this.adapter = adapter;
+	};
+
+	exports.default = Cards;
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2171,7 +2189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _cart5 = __webpack_require__(16);
+	var _cart5 = __webpack_require__(17);
 
 	var _cart6 = _interopRequireDefault(_cart5);
 
@@ -2181,9 +2199,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var defaultOptions = {
 	  include_utensils: true,
-	  notes_for_store: "These are notes for the store.",
-	  payment_type: "cash",
-	  tip: 9.5
+	  notes_for_store: "",
+	  payment_type: "credit",
+	  tip: 0
 	};
 
 	var Order = function () {
@@ -2200,6 +2218,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(Order, [{
+	    key: "setCustomer",
+	    value: function setCustomer(customer) {
+	      // TODO: Validate
+	      // email / last_name / first_name / password
+	      this.customer = customer;
+	    }
+	  }, {
+	    key: "setAddress",
+	    value: function setAddress(address) {
+	      // TODO: Validate
+	      // address attrs
+	      this.address = address;
+	    }
+	  }, {
+	    key: "setCard",
+	    value: function setCard(card) {
+	      // TODO: Validate
+	      // expiration, card_number, zip_code, cvv
+	      this.card = card;
+	    }
+	  }, {
 	    key: "isValid",
 	    value: function isValid() {
 	      return this.cart.isValid();
@@ -2233,13 +2272,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return (_cart4 = this.cart).removeLineItem.apply(_cart4, arguments);
 	    }
 	  }, {
-	    key: "format",
-	    value: function format() {
+	    key: "formatForValidation",
+	    value: function formatForValidation() {
 	      return {
 	        location_id: this.location.location_id,
 	        service_type: this.serviceType,
 	        cart: this.cart.format()
 	      };
+	    }
+	  }, {
+	    key: "formatCustomer",
+	    value: function formatCustomer() {
+	      if (!this.customer) {
+	        return {};
+	      }
+	      if (this.customer.customer_id) {
+	        return { customer_id: this.customer.customer_id };
+	      }
+	      return {
+	        email: this.customer.email,
+	        password: this.customer.password,
+	        first_name: this.customer.first_name,
+	        last_name: this.customer.last_name
+	      };
+	    }
+	  }, {
+	    key: "formatAddress",
+	    value: function formatAddress() {
+	      if (!this.address) {
+	        return {};
+	      }
+	      var _address = this.address;
+	      var customer_address_id = _address.customer_address_id;
+	      var city = _address.city;
+	      var longitude = _address.longitude;
+	      var latitude = _address.latitude;
+	      var state_code = _address.state_code;
+	      var street_address = _address.street_address;
+	      var zip_code = _address.zip_code;
+	      var unit = _address.unit;
+	      var company = _address.company;
+	      var contact_name = _address.contact_name;
+	      var contact_phone = _address.contact_phone;
+
+	      if (customer_address_id) {
+	        return { customer_address_id: customer_address_id };
+	      }
+	      return {
+	        city: city, longitude: longitude, latitude: latitude, state_code: state_code, street_address: street_address, zip_code: zip_code, unit: unit, company: company, contact_name: contact_name, contact_phone: contact_phone
+	      };
+	    }
+	  }, {
+	    key: "formatCard",
+	    value: function formatCard() {
+	      if (!this.card) {
+	        return {};
+	      }
+	      // TODO: Need card_id info from JC
+	      var _card = this.card;
+	      var card_id = _card.card_id;
+	      var expiration = _card.expiration;
+	      var card_number = _card.card_number;
+	      var zip_code = _card.zip_code;
+	      var cvv = _card.cvv;
+
+	      if (card_id) {
+	        return { card_id: card_id };
+	      }
+	      return { expiration: expiration, card_number: card_number, zip_code: zip_code, cvv: cvv };
+	    }
+	  }, {
+	    key: "format",
+	    value: function format() {
+	      var _miscOptions = this.miscOptions;
+	      var include_utensils = _miscOptions.include_utensils;
+	      var notes_for_store = _miscOptions.notes_for_store;
+	      var payment_type = _miscOptions.payment_type;
+	      var tip = _miscOptions.tip;
+
+
+	      var payload = {
+	        address: this.formatAddress(),
+	        customer: this.formatCustomer(),
+	        location_id: this.location.location_id,
+	        service_type: this.serviceType,
+	        cart: this.cart.format(),
+	        include_utensils: include_utensils,
+	        notes_for_store: notes_for_store,
+	        payment_type: payment_type
+	      };
+
+	      if (payload.payment_type === "credit") {
+	        payload.credit_card = this.formatCard();
+	      }
+	      if (payload.payment_type !== "cash") {
+	        payload.tip = tip;
+	      }
+
+	      return payload;
 	    }
 	  }]);
 
@@ -2249,7 +2379,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Order;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2260,11 +2390,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(17);
+	var _lodash = __webpack_require__(18);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _lineItem = __webpack_require__(18);
+	var _lineItem = __webpack_require__(19);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -2342,7 +2472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Cart;
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -18956,7 +19086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18969,7 +19099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(17);
+	var _lodash = __webpack_require__(18);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 

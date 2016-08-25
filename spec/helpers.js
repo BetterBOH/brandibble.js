@@ -7,6 +7,19 @@ export const TestingUser = {
   password: 'password'
 };
 
+export const TestingAddress = {
+  street_address: '123 Street St',
+  unit: '4 FL',
+  city: 'New York',
+  state_code: 'NY',
+  zip_code: 10013,
+  latitude: 40.755912,
+  longitude: -73.9709333,
+  company: 'Sanctuary Computer, Inc.',
+  contact_name: 'Hugh Francis',
+  contact_phone: '5512213610'
+};
+
 export function seedEmail() {
   return `sanctuary-testing-${(new Date()).valueOf().toString()}@example.com`;
 }
