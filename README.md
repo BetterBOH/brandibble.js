@@ -116,6 +116,8 @@ Due to the complexity of formatting data for the Orders endpoint, Brandibble.js 
 `Order` constructor, that can be used as such:
 
 ```js
+// Assemble an Order first!
+
 let newOrder = new BrandibbleRef.Order(location, 'pickup');
 let lineItem = newOrder.addLineItem(product, 1);
 
@@ -136,6 +138,13 @@ lineItem.isValid() // true
 newOrder.isValid() // true
 
 BrandibbleRef.orders.validate(newOrder);
+
+// Now Setup The order for Submission, assu
+
+newOrder.setCustomer(customer);
+newOrder.setAddress(address);
+newOrder.setCard(card);
+BrandibbleRef.orders.submit(newOrder);
 ```
 
 There are only two methods that you can do on an Order:
