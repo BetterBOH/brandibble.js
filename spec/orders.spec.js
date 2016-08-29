@@ -15,7 +15,7 @@ function configureTestingOrder(customer, address, card) {
       expect(data).to.be.a('object');
       expect(data.menu).to.be.a('array');
 
-      let newOrder = new Brandibble.Order(location, serviceType);
+      let newOrder = new Brandibble.Order(location.location_id, serviceType);
       let product  = data.menu[0].children[0].items[0];
       let lineItem = newOrder.cart.addLineItem(product, 1);
 
@@ -49,7 +49,7 @@ describe('Orders', () => {
         let data = shouldSucceed(response);
         expect(data).to.be.a('object');
         done();
-      }).catch(error => console.log(error));
+      });
     });
   });
 
@@ -64,10 +64,10 @@ describe('Orders', () => {
         let address = shouldSucceed(response)[0];
         // TODO: We should use stored cards in this test eventually
         let card = {
-          expiration: '0130',
-          card_number: Brandibble.TestCreditCards.visa[0].number,
-          zip_code: 12345,
-          cvv: 123
+          cc_expiration: '0130',
+          cc_number: Brandibble.TestCreditCards.visa[0].number,
+          cc_zip: 12345,
+          cc_cvv: 123
         };
         return configureTestingOrder(customer, address, card)
           .then(Brandibble.orders.submit.bind(Brandibble.orders))

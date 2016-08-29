@@ -27,7 +27,7 @@ describe('LineItem', () => {
     let sides = lineItem.optionGroups()[1];
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
-    expect(lineItem.format()).to.contain.all.keys(['id', 'made_for', 'instructions', 'price', 'quantity', 'option_groups']);
+    expect(lineItem.format()).to.contain.all.keys(['id', 'made_for', 'instructions', 'quantity', 'option_groups']);
   });
 
   it('it can not violate an option rule', () => {
@@ -49,5 +49,9 @@ describe('LineItem', () => {
     expect(lineItem.isValid()).to.equal(true);
     lineItem.removeOption(bases.option_items[0]);
     expect(lineItem.isValid()).to.equal(false);
+  });
+
+  it('can not be created unless product is valid', () => {
+    expect(() => { new Brandibble.LineItem({nope: 'nein'}); }).to.throw(Object);
   });
 });

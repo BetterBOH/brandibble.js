@@ -509,35 +509,35 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(3);
 
-	var _adapter = __webpack_require__(9);
+	var _adapter = __webpack_require__(10);
 
 	var _adapter2 = _interopRequireDefault(_adapter);
 
-	var _customers = __webpack_require__(10);
+	var _customers = __webpack_require__(11);
 
 	var _customers2 = _interopRequireDefault(_customers);
 
-	var _locations = __webpack_require__(11);
+	var _locations = __webpack_require__(12);
 
 	var _locations2 = _interopRequireDefault(_locations);
 
-	var _addresses = __webpack_require__(12);
+	var _addresses = __webpack_require__(13);
 
 	var _addresses2 = _interopRequireDefault(_addresses);
 
-	var _menus = __webpack_require__(13);
+	var _menus = __webpack_require__(14);
 
 	var _menus2 = _interopRequireDefault(_menus);
 
-	var _orders = __webpack_require__(14);
+	var _orders = __webpack_require__(15);
 
 	var _orders2 = _interopRequireDefault(_orders);
 
-	var _order = __webpack_require__(15);
+	var _order = __webpack_require__(16);
 
 	var _order2 = _interopRequireDefault(_order);
 
-	var _lineItem = __webpack_require__(18);
+	var _lineItem = __webpack_require__(19);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -605,6 +605,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _es6Promise2 = _interopRequireDefault(_es6Promise);
 
+	var _validate = __webpack_require__(9);
+
+	var _validate2 = _interopRequireDefault(_validate);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function localStoragePresent() {
@@ -626,6 +630,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function applyPollyfills() {
+
+	  // Better length validation for numbers
+	  var length = _validate2.default.validators.length;
+	  _validate2.default.validators.length = function (value, options, key, attributes) {
+	    if (_validate2.default.isNumber(value)) {
+	      value = "" + value;
+	    }
+	    return length.call(this, value, options, key, attributes);
+	  };
+
 	  if (typeof Promise === 'undefined') {
 	    (0, _es6Promise2.default)();
 	  }
@@ -1662,8 +1676,74 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
+
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+
+	(function () {
+	    try {
+	        cachedSetTimeout = setTimeout;
+	    } catch (e) {
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
+	    }
+	    try {
+	        cachedClearTimeout = clearTimeout;
+	    } catch (e) {
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
@@ -1688,7 +1768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -1705,7 +1785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -1717,7 +1797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -1788,6 +1868,1151 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {/*!
+	 * validate.js 0.10.0
+	 *
+	 * (c) 2013-2016 Nicklas Ansman, 2013 Wrapp
+	 * Validate.js may be freely distributed under the MIT license.
+	 * For all details and documentation:
+	 * http://validatejs.org/
+	 */
+
+	(function(exports, module, define) {
+	  "use strict";
+
+	  // The main function that calls the validators specified by the constraints.
+	  // The options are the following:
+	  //   - format (string) - An option that controls how the returned value is formatted
+	  //     * flat - Returns a flat array of just the error messages
+	  //     * grouped - Returns the messages grouped by attribute (default)
+	  //     * detailed - Returns an array of the raw validation data
+	  //   - fullMessages (boolean) - If `true` (default) the attribute name is prepended to the error.
+	  //
+	  // Please note that the options are also passed to each validator.
+	  var validate = function(attributes, constraints, options) {
+	    options = v.extend({}, v.options, options);
+
+	    var results = v.runValidations(attributes, constraints, options)
+	      , attr
+	      , validator;
+
+	    for (attr in results) {
+	      for (validator in results[attr]) {
+	        if (v.isPromise(results[attr][validator])) {
+	          throw new Error("Use validate.async if you want support for promises");
+	        }
+	      }
+	    }
+	    return validate.processValidationResults(results, options);
+	  };
+
+	  var v = validate;
+
+	  // Copies over attributes from one or more sources to a single destination.
+	  // Very much similar to underscore's extend.
+	  // The first argument is the target object and the remaining arguments will be
+	  // used as sources.
+	  v.extend = function(obj) {
+	    [].slice.call(arguments, 1).forEach(function(source) {
+	      for (var attr in source) {
+	        obj[attr] = source[attr];
+	      }
+	    });
+	    return obj;
+	  };
+
+	  v.extend(validate, {
+	    // This is the version of the library as a semver.
+	    // The toString function will allow it to be coerced into a string
+	    version: {
+	      major: 0,
+	      minor: 10,
+	      patch: 0,
+	      metadata: null,
+	      toString: function() {
+	        var version = v.format("%{major}.%{minor}.%{patch}", v.version);
+	        if (!v.isEmpty(v.version.metadata)) {
+	          version += "+" + v.version.metadata;
+	        }
+	        return version;
+	      }
+	    },
+
+	    // Below is the dependencies that are used in validate.js
+
+	    // The constructor of the Promise implementation.
+	    // If you are using Q.js, RSVP or any other A+ compatible implementation
+	    // override this attribute to be the constructor of that promise.
+	    // Since jQuery promises aren't A+ compatible they won't work.
+	    Promise: typeof Promise !== "undefined" ? Promise : /* istanbul ignore next */ null,
+
+	    EMPTY_STRING_REGEXP: /^\s*$/,
+
+	    // Runs the validators specified by the constraints object.
+	    // Will return an array of the format:
+	    //     [{attribute: "<attribute name>", error: "<validation result>"}, ...]
+	    runValidations: function(attributes, constraints, options) {
+	      var results = []
+	        , attr
+	        , validatorName
+	        , value
+	        , validators
+	        , validator
+	        , validatorOptions
+	        , error;
+
+	      if (v.isDomElement(attributes) || v.isJqueryElement(attributes)) {
+	        attributes = v.collectFormValues(attributes);
+	      }
+
+	      // Loops through each constraints, finds the correct validator and run it.
+	      for (attr in constraints) {
+	        value = v.getDeepObjectValue(attributes, attr);
+	        // This allows the constraints for an attribute to be a function.
+	        // The function will be called with the value, attribute name, the complete dict of
+	        // attributes as well as the options and constraints passed in.
+	        // This is useful when you want to have different
+	        // validations depending on the attribute value.
+	        validators = v.result(constraints[attr], value, attributes, attr, options, constraints);
+
+	        for (validatorName in validators) {
+	          validator = v.validators[validatorName];
+
+	          if (!validator) {
+	            error = v.format("Unknown validator %{name}", {name: validatorName});
+	            throw new Error(error);
+	          }
+
+	          validatorOptions = validators[validatorName];
+	          // This allows the options to be a function. The function will be
+	          // called with the value, attribute name, the complete dict of
+	          // attributes as well as the options and constraints passed in.
+	          // This is useful when you want to have different
+	          // validations depending on the attribute value.
+	          validatorOptions = v.result(validatorOptions, value, attributes, attr, options, constraints);
+	          if (!validatorOptions) {
+	            continue;
+	          }
+	          results.push({
+	            attribute: attr,
+	            value: value,
+	            validator: validatorName,
+	            globalOptions: options,
+	            attributes: attributes,
+	            options: validatorOptions,
+	            error: validator.call(validator,
+	                value,
+	                validatorOptions,
+	                attr,
+	                attributes,
+	                options)
+	          });
+	        }
+	      }
+
+	      return results;
+	    },
+
+	    // Takes the output from runValidations and converts it to the correct
+	    // output format.
+	    processValidationResults: function(errors, options) {
+	      var attr;
+
+	      errors = v.pruneEmptyErrors(errors, options);
+	      errors = v.expandMultipleErrors(errors, options);
+	      errors = v.convertErrorMessages(errors, options);
+
+	      switch (options.format || "grouped") {
+	        case "detailed":
+	          // Do nothing more to the errors
+	          break;
+
+	        case "flat":
+	          errors = v.flattenErrorsToArray(errors);
+	          break;
+
+	        case "grouped":
+	          errors = v.groupErrorsByAttribute(errors);
+	          for (attr in errors) {
+	            errors[attr] = v.flattenErrorsToArray(errors[attr]);
+	          }
+	          break;
+
+	        default:
+	          throw new Error(v.format("Unknown format %{format}", options));
+	      }
+
+	      return v.isEmpty(errors) ? undefined : errors;
+	    },
+
+	    // Runs the validations with support for promises.
+	    // This function will return a promise that is settled when all the
+	    // validation promises have been completed.
+	    // It can be called even if no validations returned a promise.
+	    async: function(attributes, constraints, options) {
+	      options = v.extend({}, v.async.options, options);
+
+	      var WrapErrors = options.wrapErrors || function(errors) {
+	        return errors;
+	      };
+
+	      // Removes unknown attributes
+	      if (options.cleanAttributes !== false) {
+	        attributes = v.cleanAttributes(attributes, constraints);
+	      }
+
+	      var results = v.runValidations(attributes, constraints, options);
+
+	      return new v.Promise(function(resolve, reject) {
+	        v.waitForResults(results).then(function() {
+	          var errors = v.processValidationResults(results, options);
+	          if (errors) {
+	            reject(new WrapErrors(errors, options, attributes, constraints));
+	          } else {
+	            resolve(attributes);
+	          }
+	        }, function(err) {
+	          reject(err);
+	        });
+	      });
+	    },
+
+	    single: function(value, constraints, options) {
+	      options = v.extend({}, v.single.options, options, {
+	        format: "flat",
+	        fullMessages: false
+	      });
+	      return v({single: value}, {single: constraints}, options);
+	    },
+
+	    // Returns a promise that is resolved when all promises in the results array
+	    // are settled. The promise returned from this function is always resolved,
+	    // never rejected.
+	    // This function modifies the input argument, it replaces the promises
+	    // with the value returned from the promise.
+	    waitForResults: function(results) {
+	      // Create a sequence of all the results starting with a resolved promise.
+	      return results.reduce(function(memo, result) {
+	        // If this result isn't a promise skip it in the sequence.
+	        if (!v.isPromise(result.error)) {
+	          return memo;
+	        }
+
+	        return memo.then(function() {
+	          return result.error.then(
+	            function(error) {
+	              result.error = error || null;
+	            },
+	            function(error) {
+	              if (error instanceof Error) {
+	                throw error;
+	              }
+	              v.error("Rejecting promises with the result is deprecated. Please use the resolve callback instead.");
+	              result.error = error;
+	            }
+	          );
+	        });
+	      }, new v.Promise(function(r) { r(); })); // A resolved promise
+	    },
+
+	    // If the given argument is a call: function the and: function return the value
+	    // otherwise just return the value. Additional arguments will be passed as
+	    // arguments to the function.
+	    // Example:
+	    // ```
+	    // result('foo') // 'foo'
+	    // result(Math.max, 1, 2) // 2
+	    // ```
+	    result: function(value) {
+	      var args = [].slice.call(arguments, 1);
+	      if (typeof value === 'function') {
+	        value = value.apply(null, args);
+	      }
+	      return value;
+	    },
+
+	    // Checks if the value is a number. This function does not consider NaN a
+	    // number like many other `isNumber` functions do.
+	    isNumber: function(value) {
+	      return typeof value === 'number' && !isNaN(value);
+	    },
+
+	    // Returns false if the object is not a function
+	    isFunction: function(value) {
+	      return typeof value === 'function';
+	    },
+
+	    // A simple check to verify that the value is an integer. Uses `isNumber`
+	    // and a simple modulo check.
+	    isInteger: function(value) {
+	      return v.isNumber(value) && value % 1 === 0;
+	    },
+
+	    // Checks if the value is a boolean
+	    isBoolean: function(value) {
+	      return typeof value === 'boolean';
+	    },
+
+	    // Uses the `Object` function to check if the given argument is an object.
+	    isObject: function(obj) {
+	      return obj === Object(obj);
+	    },
+
+	    // Simply checks if the object is an instance of a date
+	    isDate: function(obj) {
+	      return obj instanceof Date;
+	    },
+
+	    // Returns false if the object is `null` of `undefined`
+	    isDefined: function(obj) {
+	      return obj !== null && obj !== undefined;
+	    },
+
+	    // Checks if the given argument is a promise. Anything with a `then`
+	    // function is considered a promise.
+	    isPromise: function(p) {
+	      return !!p && v.isFunction(p.then);
+	    },
+
+	    isJqueryElement: function(o) {
+	      return o && v.isString(o.jquery);
+	    },
+
+	    isDomElement: function(o) {
+	      if (!o) {
+	        return false;
+	      }
+
+	      if (!o.querySelectorAll || !o.querySelector) {
+	        return false;
+	      }
+
+	      if (v.isObject(document) && o === document) {
+	        return true;
+	      }
+
+	      // http://stackoverflow.com/a/384380/699304
+	      /* istanbul ignore else */
+	      if (typeof HTMLElement === "object") {
+	        return o instanceof HTMLElement;
+	      } else {
+	        return o &&
+	          typeof o === "object" &&
+	          o !== null &&
+	          o.nodeType === 1 &&
+	          typeof o.nodeName === "string";
+	      }
+	    },
+
+	    isEmpty: function(value) {
+	      var attr;
+
+	      // Null and undefined are empty
+	      if (!v.isDefined(value)) {
+	        return true;
+	      }
+
+	      // functions are non empty
+	      if (v.isFunction(value)) {
+	        return false;
+	      }
+
+	      // Whitespace only strings are empty
+	      if (v.isString(value)) {
+	        return v.EMPTY_STRING_REGEXP.test(value);
+	      }
+
+	      // For arrays we use the length property
+	      if (v.isArray(value)) {
+	        return value.length === 0;
+	      }
+
+	      // Dates have no attributes but aren't empty
+	      if (v.isDate(value)) {
+	        return false;
+	      }
+
+	      // If we find at least one property we consider it non empty
+	      if (v.isObject(value)) {
+	        for (attr in value) {
+	          return false;
+	        }
+	        return true;
+	      }
+
+	      return false;
+	    },
+
+	    // Formats the specified strings with the given values like so:
+	    // ```
+	    // format("Foo: %{foo}", {foo: "bar"}) // "Foo bar"
+	    // ```
+	    // If you want to write %{...} without having it replaced simply
+	    // prefix it with % like this `Foo: %%{foo}` and it will be returned
+	    // as `"Foo: %{foo}"`
+	    format: v.extend(function(str, vals) {
+	      if (!v.isString(str)) {
+	        return str;
+	      }
+	      return str.replace(v.format.FORMAT_REGEXP, function(m0, m1, m2) {
+	        if (m1 === '%') {
+	          return "%{" + m2 + "}";
+	        } else {
+	          return String(vals[m2]);
+	        }
+	      });
+	    }, {
+	      // Finds %{key} style patterns in the given string
+	      FORMAT_REGEXP: /(%?)%\{([^\}]+)\}/g
+	    }),
+
+	    // "Prettifies" the given string.
+	    // Prettifying means replacing [.\_-] with spaces as well as splitting
+	    // camel case words.
+	    prettify: function(str) {
+	      if (v.isNumber(str)) {
+	        // If there are more than 2 decimals round it to two
+	        if ((str * 100) % 1 === 0) {
+	          return "" + str;
+	        } else {
+	          return parseFloat(Math.round(str * 100) / 100).toFixed(2);
+	        }
+	      }
+
+	      if (v.isArray(str)) {
+	        return str.map(function(s) { return v.prettify(s); }).join(", ");
+	      }
+
+	      if (v.isObject(str)) {
+	        return str.toString();
+	      }
+
+	      // Ensure the string is actually a string
+	      str = "" + str;
+
+	      return str
+	        // Splits keys separated by periods
+	        .replace(/([^\s])\.([^\s])/g, '$1 $2')
+	        // Removes backslashes
+	        .replace(/\\+/g, '')
+	        // Replaces - and - with space
+	        .replace(/[_-]/g, ' ')
+	        // Splits camel cased words
+	        .replace(/([a-z])([A-Z])/g, function(m0, m1, m2) {
+	          return "" + m1 + " " + m2.toLowerCase();
+	        })
+	        .toLowerCase();
+	    },
+
+	    stringifyValue: function(value) {
+	      return v.prettify(value);
+	    },
+
+	    isString: function(value) {
+	      return typeof value === 'string';
+	    },
+
+	    isArray: function(value) {
+	      return {}.toString.call(value) === '[object Array]';
+	    },
+
+	    // Checks if the object is a hash, which is equivalent to an object that
+	    // is neither an array nor a function.
+	    isHash: function(value) {
+	      return v.isObject(value) && !v.isArray(value) && !v.isFunction(value);
+	    },
+
+	    contains: function(obj, value) {
+	      if (!v.isDefined(obj)) {
+	        return false;
+	      }
+	      if (v.isArray(obj)) {
+	        return obj.indexOf(value) !== -1;
+	      }
+	      return value in obj;
+	    },
+
+	    unique: function(array) {
+	      if (!v.isArray(array)) {
+	        return array;
+	      }
+	      return array.filter(function(el, index, array) {
+	        return array.indexOf(el) == index;
+	      });
+	    },
+
+	    forEachKeyInKeypath: function(object, keypath, callback) {
+	      if (!v.isString(keypath)) {
+	        return undefined;
+	      }
+
+	      var key = ""
+	        , i
+	        , escape = false;
+
+	      for (i = 0; i < keypath.length; ++i) {
+	        switch (keypath[i]) {
+	          case '.':
+	            if (escape) {
+	              escape = false;
+	              key += '.';
+	            } else {
+	              object = callback(object, key, false);
+	              key = "";
+	            }
+	            break;
+
+	          case '\\':
+	            if (escape) {
+	              escape = false;
+	              key += '\\';
+	            } else {
+	              escape = true;
+	            }
+	            break;
+
+	          default:
+	            escape = false;
+	            key += keypath[i];
+	            break;
+	        }
+	      }
+
+	      return callback(object, key, true);
+	    },
+
+	    getDeepObjectValue: function(obj, keypath) {
+	      if (!v.isObject(obj)) {
+	        return undefined;
+	      }
+
+	      return v.forEachKeyInKeypath(obj, keypath, function(obj, key) {
+	        if (v.isObject(obj)) {
+	          return obj[key];
+	        }
+	      });
+	    },
+
+	    // This returns an object with all the values of the form.
+	    // It uses the input name as key and the value as value
+	    // So for example this:
+	    // <input type="text" name="email" value="foo@bar.com" />
+	    // would return:
+	    // {email: "foo@bar.com"}
+	    collectFormValues: function(form, options) {
+	      var values = {}
+	        , i
+	        , input
+	        , inputs
+	        , value;
+
+	      if (v.isJqueryElement(form)) {
+	        form = form[0];
+	      }
+
+	      if (!form) {
+	        return values;
+	      }
+
+	      options = options || {};
+
+	      inputs = form.querySelectorAll("input[name], textarea[name]");
+	      for (i = 0; i < inputs.length; ++i) {
+	        input = inputs.item(i);
+
+	        if (v.isDefined(input.getAttribute("data-ignored"))) {
+	          continue;
+	        }
+
+	        value = v.sanitizeFormValue(input.value, options);
+	        if (input.type === "number") {
+	          value = value ? +value : null;
+	        } else if (input.type === "checkbox") {
+	          if (input.attributes.value) {
+	            if (!input.checked) {
+	              value = values[input.name] || null;
+	            }
+	          } else {
+	            value = input.checked;
+	          }
+	        } else if (input.type === "radio") {
+	          if (!input.checked) {
+	            value = values[input.name] || null;
+	          }
+	        }
+	        values[input.name] = value;
+	      }
+
+	      inputs = form.querySelectorAll("select[name]");
+	      for (i = 0; i < inputs.length; ++i) {
+	        input = inputs.item(i);
+	        value = v.sanitizeFormValue(input.options[input.selectedIndex].value, options);
+	        values[input.name] = value;
+	      }
+
+	      return values;
+	    },
+
+	    sanitizeFormValue: function(value, options) {
+	      if (options.trim && v.isString(value)) {
+	        value = value.trim();
+	      }
+
+	      if (options.nullify !== false && value === "") {
+	        return null;
+	      }
+	      return value;
+	    },
+
+	    capitalize: function(str) {
+	      if (!v.isString(str)) {
+	        return str;
+	      }
+	      return str[0].toUpperCase() + str.slice(1);
+	    },
+
+	    // Remove all errors who's error attribute is empty (null or undefined)
+	    pruneEmptyErrors: function(errors) {
+	      return errors.filter(function(error) {
+	        return !v.isEmpty(error.error);
+	      });
+	    },
+
+	    // In
+	    // [{error: ["err1", "err2"], ...}]
+	    // Out
+	    // [{error: "err1", ...}, {error: "err2", ...}]
+	    //
+	    // All attributes in an error with multiple messages are duplicated
+	    // when expanding the errors.
+	    expandMultipleErrors: function(errors) {
+	      var ret = [];
+	      errors.forEach(function(error) {
+	        // Removes errors without a message
+	        if (v.isArray(error.error)) {
+	          error.error.forEach(function(msg) {
+	            ret.push(v.extend({}, error, {error: msg}));
+	          });
+	        } else {
+	          ret.push(error);
+	        }
+	      });
+	      return ret;
+	    },
+
+	    // Converts the error mesages by prepending the attribute name unless the
+	    // message is prefixed by ^
+	    convertErrorMessages: function(errors, options) {
+	      options = options || {};
+
+	      var ret = [];
+	      errors.forEach(function(errorInfo) {
+	        var error = v.result(errorInfo.error,
+	            errorInfo.value,
+	            errorInfo.attribute,
+	            errorInfo.options,
+	            errorInfo.attributes,
+	            errorInfo.globalOptions);
+
+	        if (!v.isString(error)) {
+	          ret.push(errorInfo);
+	          return;
+	        }
+
+	        if (error[0] === '^') {
+	          error = error.slice(1);
+	        } else if (options.fullMessages !== false) {
+	          error = v.capitalize(v.prettify(errorInfo.attribute)) + " " + error;
+	        }
+	        error = error.replace(/\\\^/g, "^");
+	        error = v.format(error, {value: v.stringifyValue(errorInfo.value)});
+	        ret.push(v.extend({}, errorInfo, {error: error}));
+	      });
+	      return ret;
+	    },
+
+	    // In:
+	    // [{attribute: "<attributeName>", ...}]
+	    // Out:
+	    // {"<attributeName>": [{attribute: "<attributeName>", ...}]}
+	    groupErrorsByAttribute: function(errors) {
+	      var ret = {};
+	      errors.forEach(function(error) {
+	        var list = ret[error.attribute];
+	        if (list) {
+	          list.push(error);
+	        } else {
+	          ret[error.attribute] = [error];
+	        }
+	      });
+	      return ret;
+	    },
+
+	    // In:
+	    // [{error: "<message 1>", ...}, {error: "<message 2>", ...}]
+	    // Out:
+	    // ["<message 1>", "<message 2>"]
+	    flattenErrorsToArray: function(errors) {
+	      return errors.map(function(error) { return error.error; });
+	    },
+
+	    cleanAttributes: function(attributes, whitelist) {
+	      function whitelistCreator(obj, key, last) {
+	        if (v.isObject(obj[key])) {
+	          return obj[key];
+	        }
+	        return (obj[key] = last ? true : {});
+	      }
+
+	      function buildObjectWhitelist(whitelist) {
+	        var ow = {}
+	          , lastObject
+	          , attr;
+	        for (attr in whitelist) {
+	          if (!whitelist[attr]) {
+	            continue;
+	          }
+	          v.forEachKeyInKeypath(ow, attr, whitelistCreator);
+	        }
+	        return ow;
+	      }
+
+	      function cleanRecursive(attributes, whitelist) {
+	        if (!v.isObject(attributes)) {
+	          return attributes;
+	        }
+
+	        var ret = v.extend({}, attributes)
+	          , w
+	          , attribute;
+
+	        for (attribute in attributes) {
+	          w = whitelist[attribute];
+
+	          if (v.isObject(w)) {
+	            ret[attribute] = cleanRecursive(ret[attribute], w);
+	          } else if (!w) {
+	            delete ret[attribute];
+	          }
+	        }
+	        return ret;
+	      }
+
+	      if (!v.isObject(whitelist) || !v.isObject(attributes)) {
+	        return {};
+	      }
+
+	      whitelist = buildObjectWhitelist(whitelist);
+	      return cleanRecursive(attributes, whitelist);
+	    },
+
+	    exposeModule: function(validate, root, exports, module, define) {
+	      if (exports) {
+	        if (module && module.exports) {
+	          exports = module.exports = validate;
+	        }
+	        exports.validate = validate;
+	      } else {
+	        root.validate = validate;
+	        if (validate.isFunction(define) && define.amd) {
+	          define([], function () { return validate; });
+	        }
+	      }
+	    },
+
+	    warn: function(msg) {
+	      if (typeof console !== "undefined" && console.warn) {
+	        console.warn("[validate.js] " + msg);
+	      }
+	    },
+
+	    error: function(msg) {
+	      if (typeof console !== "undefined" && console.error) {
+	        console.error("[validate.js] " + msg);
+	      }
+	    }
+	  });
+
+	  validate.validators = {
+	    // Presence validates that the value isn't empty
+	    presence: function(value, options) {
+	      options = v.extend({}, this.options, options);
+	      if (v.isEmpty(value)) {
+	        return options.message || this.message || "can't be blank";
+	      }
+	    },
+	    length: function(value, options, attribute) {
+	      // Empty values are allowed
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+
+	      options = v.extend({}, this.options, options);
+
+	      var is = options.is
+	        , maximum = options.maximum
+	        , minimum = options.minimum
+	        , tokenizer = options.tokenizer || function(val) { return val; }
+	        , err
+	        , errors = [];
+
+	      value = tokenizer(value);
+	      var length = value.length;
+	      if(!v.isNumber(length)) {
+	        v.error(v.format("Attribute %{attr} has a non numeric value for `length`", {attr: attribute}));
+	        return options.message || this.notValid || "has an incorrect length";
+	      }
+
+	      // Is checks
+	      if (v.isNumber(is) && length !== is) {
+	        err = options.wrongLength ||
+	          this.wrongLength ||
+	          "is the wrong length (should be %{count} characters)";
+	        errors.push(v.format(err, {count: is}));
+	      }
+
+	      if (v.isNumber(minimum) && length < minimum) {
+	        err = options.tooShort ||
+	          this.tooShort ||
+	          "is too short (minimum is %{count} characters)";
+	        errors.push(v.format(err, {count: minimum}));
+	      }
+
+	      if (v.isNumber(maximum) && length > maximum) {
+	        err = options.tooLong ||
+	          this.tooLong ||
+	          "is too long (maximum is %{count} characters)";
+	        errors.push(v.format(err, {count: maximum}));
+	      }
+
+	      if (errors.length > 0) {
+	        return options.message || errors;
+	      }
+	    },
+	    numericality: function(value, options) {
+	      // Empty values are fine
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+
+	      options = v.extend({}, this.options, options);
+
+	      var errors = []
+	        , name
+	        , count
+	        , checks = {
+	            greaterThan:          function(v, c) { return v > c; },
+	            greaterThanOrEqualTo: function(v, c) { return v >= c; },
+	            equalTo:              function(v, c) { return v === c; },
+	            lessThan:             function(v, c) { return v < c; },
+	            lessThanOrEqualTo:    function(v, c) { return v <= c; },
+	            divisibleBy:          function(v, c) { return v % c === 0; }
+	          };
+
+	      // Strict will check that it is a valid looking number
+	      if (v.isString(value) && options.strict) {
+	        var pattern = "^(0|[1-9]\\d*)";
+	        if (!options.onlyInteger) {
+	          pattern += "(\\.\\d+)?";
+	        }
+	        pattern += "$";
+
+	        if (!(new RegExp(pattern).test(value))) {
+	          return options.message || options.notValid || this.notValid || "must be a valid number";
+	        }
+	      }
+
+	      // Coerce the value to a number unless we're being strict.
+	      if (options.noStrings !== true && v.isString(value)) {
+	        value = +value;
+	      }
+
+	      // If it's not a number we shouldn't continue since it will compare it.
+	      if (!v.isNumber(value)) {
+	        return options.message || options.notValid || this.notValid || "is not a number";
+	      }
+
+	      // Same logic as above, sort of. Don't bother with comparisons if this
+	      // doesn't pass.
+	      if (options.onlyInteger && !v.isInteger(value)) {
+	        return options.message || options.notInteger || this.notInteger  || "must be an integer";
+	      }
+
+	      for (name in checks) {
+	        count = options[name];
+	        if (v.isNumber(count) && !checks[name](value, count)) {
+	          // This picks the default message if specified
+	          // For example the greaterThan check uses the message from
+	          // this.notGreaterThan so we capitalize the name and prepend "not"
+	          var key = "not" + v.capitalize(name);
+	          var msg = options[key] || this[key] || "must be %{type} %{count}";
+
+	          errors.push(v.format(msg, {
+	            count: count,
+	            type: v.prettify(name)
+	          }));
+	        }
+	      }
+
+	      if (options.odd && value % 2 !== 1) {
+	        errors.push(options.notOdd || this.notOdd || "must be odd");
+	      }
+	      if (options.even && value % 2 !== 0) {
+	        errors.push(options.notEven || this.notEven || "must be even");
+	      }
+
+	      if (errors.length) {
+	        return options.message || errors;
+	      }
+	    },
+	    datetime: v.extend(function(value, options) {
+	      if (!v.isFunction(this.parse) || !v.isFunction(this.format)) {
+	        throw new Error("Both the parse and format functions needs to be set to use the datetime/date validator");
+	      }
+
+	      // Empty values are fine
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+
+	      options = v.extend({}, this.options, options);
+
+	      var err
+	        , errors = []
+	        , earliest = options.earliest ? this.parse(options.earliest, options) : NaN
+	        , latest = options.latest ? this.parse(options.latest, options) : NaN;
+
+	      value = this.parse(value, options);
+
+	      // 86400000 is the number of seconds in a day, this is used to remove
+	      // the time from the date
+	      if (isNaN(value) || options.dateOnly && value % 86400000 !== 0) {
+	        err = options.notValid ||
+	          options.message ||
+	          this.notValid ||
+	          "must be a valid date";
+	        return v.format(err, {value: arguments[0]});
+	      }
+
+	      if (!isNaN(earliest) && value < earliest) {
+	        err = options.tooEarly ||
+	          options.message ||
+	          this.tooEarly ||
+	          "must be no earlier than %{date}";
+	        err = v.format(err, {
+	          value: this.format(value, options),
+	          date: this.format(earliest, options)
+	        });
+	        errors.push(err);
+	      }
+
+	      if (!isNaN(latest) && value > latest) {
+	        err = options.tooLate ||
+	          options.message ||
+	          this.tooLate ||
+	          "must be no later than %{date}";
+	        err = v.format(err, {
+	          date: this.format(latest, options),
+	          value: this.format(value, options)
+	        });
+	        errors.push(err);
+	      }
+
+	      if (errors.length) {
+	        return v.unique(errors);
+	      }
+	    }, {
+	      parse: null,
+	      format: null
+	    }),
+	    date: function(value, options) {
+	      options = v.extend({}, options, {dateOnly: true});
+	      return v.validators.datetime.call(v.validators.datetime, value, options);
+	    },
+	    format: function(value, options) {
+	      if (v.isString(options) || (options instanceof RegExp)) {
+	        options = {pattern: options};
+	      }
+
+	      options = v.extend({}, this.options, options);
+
+	      var message = options.message || this.message || "is invalid"
+	        , pattern = options.pattern
+	        , match;
+
+	      // Empty values are allowed
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+	      if (!v.isString(value)) {
+	        return message;
+	      }
+
+	      if (v.isString(pattern)) {
+	        pattern = new RegExp(options.pattern, options.flags);
+	      }
+	      match = pattern.exec(value);
+	      if (!match || match[0].length != value.length) {
+	        return message;
+	      }
+	    },
+	    inclusion: function(value, options) {
+	      // Empty values are fine
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+	      if (v.isArray(options)) {
+	        options = {within: options};
+	      }
+	      options = v.extend({}, this.options, options);
+	      if (v.contains(options.within, value)) {
+	        return;
+	      }
+	      var message = options.message ||
+	        this.message ||
+	        "^%{value} is not included in the list";
+	      return v.format(message, {value: value});
+	    },
+	    exclusion: function(value, options) {
+	      // Empty values are fine
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+	      if (v.isArray(options)) {
+	        options = {within: options};
+	      }
+	      options = v.extend({}, this.options, options);
+	      if (!v.contains(options.within, value)) {
+	        return;
+	      }
+	      var message = options.message || this.message || "^%{value} is restricted";
+	      return v.format(message, {value: value});
+	    },
+	    email: v.extend(function(value, options) {
+	      options = v.extend({}, this.options, options);
+	      var message = options.message || this.message || "is not a valid email";
+	      // Empty values are fine
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+	      if (!v.isString(value)) {
+	        return message;
+	      }
+	      if (!this.PATTERN.exec(value)) {
+	        return message;
+	      }
+	    }, {
+	      PATTERN: /^[a-z0-9\u007F-\uffff!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9\u007F-\uffff!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i
+	    }),
+	    equality: function(value, options, attribute, attributes) {
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+
+	      if (v.isString(options)) {
+	        options = {attribute: options};
+	      }
+	      options = v.extend({}, this.options, options);
+	      var message = options.message ||
+	        this.message ||
+	        "is not equal to %{attribute}";
+
+	      if (v.isEmpty(options.attribute) || !v.isString(options.attribute)) {
+	        throw new Error("The attribute must be a non empty string");
+	      }
+
+	      var otherValue = v.getDeepObjectValue(attributes, options.attribute)
+	        , comparator = options.comparator || function(v1, v2) {
+	          return v1 === v2;
+	        };
+
+	      if (!comparator(value, otherValue, options, attribute, attributes)) {
+	        return v.format(message, {attribute: v.prettify(options.attribute)});
+	      }
+	    },
+
+	    // A URL validator that is used to validate URLs with the ability to
+	    // restrict schemes and some domains.
+	    url: function(value, options) {
+	      if (v.isEmpty(value)) {
+	        return;
+	      }
+
+	      options = v.extend({}, this.options, options);
+
+	      var message = options.message || this.message || "is not a valid url"
+	        , schemes = options.schemes || this.schemes || ['http', 'https']
+	        , allowLocal = options.allowLocal || this.allowLocal || false;
+
+	      if (!v.isString(value)) {
+	        return message;
+	      }
+
+	      // https://gist.github.com/dperini/729294
+	      var regex =
+	        "^" +
+	          // schemes
+	          "(?:(?:" + schemes.join("|") + "):\\/\\/)" +
+	          // credentials
+	          "(?:\\S+(?::\\S*)?@)?";
+
+	      regex += "(?:";
+
+	      var tld = "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))";
+
+	      // This ia a special case for the localhost hostname
+	      if (allowLocal) {
+	        tld += "?";
+	      } else {
+	        // private & local addresses
+	        regex +=
+	          "(?!10(?:\\.\\d{1,3}){3})" +
+	          "(?!127(?:\\.\\d{1,3}){3})" +
+	          "(?!169\\.254(?:\\.\\d{1,3}){2})" +
+	          "(?!192\\.168(?:\\.\\d{1,3}){2})" +
+	          "(?!172" +
+	          "\\.(?:1[6-9]|2\\d|3[0-1])" +
+	          "(?:\\.\\d{1,3})" +
+	          "{2})";
+	      }
+
+	      var hostname =
+	          "(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)" +
+	          "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*" +
+	          tld + ")";
+
+	      // reserved addresses
+	      regex +=
+	          "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
+	          "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
+	          "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
+	        "|" +
+	          hostname +
+	          // port number
+	          "(?::\\d{2,5})?" +
+	          // path
+	          "(?:\\/[^\\s]*)?" +
+	        "$";
+
+	      var PATTERN = new RegExp(regex, 'i');
+	      if (!PATTERN.exec(value)) {
+	        return message;
+	      }
+	    }
+	  };
+
+	  validate.exposeModule(validate, this, exports, module, __webpack_require__(8));
+	}).call(this,
+	         true ? /* istanbul ignore next */ exports : null,
+	         true ? /* istanbul ignore next */ module : null,
+	        __webpack_require__(8));
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)(module)))
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1897,7 +3122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Adapter;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2002,7 +3227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Customers;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2035,7 +3260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Locations;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2073,7 +3298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Addresses;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2109,7 +3334,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Menus;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2153,10 +3378,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Orders;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2164,9 +3389,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _cart5 = __webpack_require__(16);
+	var _cart5 = __webpack_require__(17);
 
 	var _cart6 = _interopRequireDefault(_cart5);
+
+	var _validate = __webpack_require__(9);
+
+	var _validate2 = _interopRequireDefault(_validate);
+
+	var _validations = __webpack_require__(20);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2180,83 +3411,101 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var Order = function () {
-	  function Order(location) {
+	  function Order(location_id) {
 	    var serviceType = arguments.length <= 1 || arguments[1] === undefined ? 'delivery' : arguments[1];
 	    var miscOptions = arguments.length <= 2 || arguments[2] === undefined ? defaultOptions : arguments[2];
 
 	    _classCallCheck(this, Order);
 
 	    this.cart = new _cart6.default();
-	    this.location = location;
+	    this.location_id = location_id;
 	    this.serviceType = serviceType;
 	    this.miscOptions = miscOptions;
 	  }
 
 	  _createClass(Order, [{
-	    key: "setCustomer",
+	    key: 'setCustomer',
 	    value: function setCustomer(customer) {
-	      // TODO: Validate
-	      // email / last_name / first_name / password
-	      this.customer = customer;
+	      var customer_id = customer.customer_id;
+
+	      if (customer_id) {
+	        this.customer = { customer_id: customer_id };
+	        return true;
+	      }
+	      var result = (0, _validate2.default)(customer, _validations.customerValidations);
+	      if (!result) {
+	        this.customer = customer;
+	        return true;
+	      }
+	      return result;
 	    }
 	  }, {
-	    key: "setAddress",
+	    key: 'setAddress',
 	    value: function setAddress(address) {
 	      // TODO: Validate
 	      // address attrs
 	      this.address = address;
 	    }
 	  }, {
-	    key: "setCard",
+	    key: 'setCard',
 	    value: function setCard(card) {
-	      // TODO: Validate
-	      // expiration, card_number, zip_code, cvv
-	      this.card = card;
+	      var customer_card_id = card.customer_card_id;
+
+	      if (customer_card_id) {
+	        this.card = { customer_card_id: customer_card_id };
+	        return true;
+	      }
+	      var result = (0, _validate2.default)(card, _validations.cardValidations);
+	      if (!result) {
+	        this.card = card;
+	        return true;
+	      }
+	      return result;
 	    }
 	  }, {
-	    key: "isValid",
+	    key: 'isValid',
 	    value: function isValid() {
 	      return this.cart.isValid();
 	    }
 	  }, {
-	    key: "addLineItem",
+	    key: 'addLineItem',
 	    value: function addLineItem() {
 	      var _cart;
 
 	      return (_cart = this.cart).addLineItem.apply(_cart, arguments);
 	    }
 	  }, {
-	    key: "getLineItemQuantity",
+	    key: 'getLineItemQuantity',
 	    value: function getLineItemQuantity() {
 	      var _cart2;
 
 	      return (_cart2 = this.cart).getLineItemQuantity.apply(_cart2, arguments);
 	    }
 	  }, {
-	    key: "setLineItemQuantity",
+	    key: 'setLineItemQuantity',
 	    value: function setLineItemQuantity() {
 	      var _cart3;
 
 	      return (_cart3 = this.cart).setLineItemQuantity.apply(_cart3, arguments);
 	    }
 	  }, {
-	    key: "removeLineItem",
+	    key: 'removeLineItem',
 	    value: function removeLineItem() {
 	      var _cart4;
 
 	      return (_cart4 = this.cart).removeLineItem.apply(_cart4, arguments);
 	    }
 	  }, {
-	    key: "formatForValidation",
+	    key: 'formatForValidation',
 	    value: function formatForValidation() {
 	      return {
-	        location_id: this.location.location_id,
+	        location_id: this.location_id,
 	        service_type: this.serviceType,
 	        cart: this.cart.format()
 	      };
 	    }
 	  }, {
-	    key: "formatCustomer",
+	    key: 'formatCustomer',
 	    value: function formatCustomer() {
 	      if (!this.customer) {
 	        return {};
@@ -2272,7 +3521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    }
 	  }, {
-	    key: "formatAddress",
+	    key: 'formatAddress',
 	    value: function formatAddress() {
 	      if (!this.address) {
 	        return {};
@@ -2298,26 +3547,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    }
 	  }, {
-	    key: "formatCard",
+	    key: 'formatCard',
 	    value: function formatCard() {
 	      if (!this.card) {
 	        return {};
 	      }
 	      // TODO: Need card_id info from JC
 	      var _card = this.card;
-	      var card_id = _card.card_id;
-	      var expiration = _card.expiration;
-	      var card_number = _card.card_number;
-	      var zip_code = _card.zip_code;
-	      var cvv = _card.cvv;
+	      var customer_card_id = _card.customer_card_id;
+	      var cc_expiration = _card.cc_expiration;
+	      var cc_number = _card.cc_number;
+	      var cc_zip = _card.cc_zip;
+	      var cc_cvv = _card.cc_cvv;
 
-	      if (card_id) {
-	        return { card_id: card_id };
+	      if (customer_card_id) {
+	        return { customer_card_id: customer_card_id };
 	      }
-	      return { expiration: expiration, card_number: card_number, zip_code: zip_code, cvv: cvv };
+	      return { cc_expiration: cc_expiration, cc_number: cc_number, cc_zip: cc_zip, cc_cvv: cc_cvv };
 	    }
 	  }, {
-	    key: "format",
+	    key: 'format',
 	    value: function format() {
 	      var _miscOptions = this.miscOptions;
 	      var include_utensils = _miscOptions.include_utensils;
@@ -2329,7 +3578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var payload = {
 	        address: this.formatAddress(),
 	        customer: this.formatCustomer(),
-	        location_id: this.location.location_id,
+	        location_id: this.location_id,
 	        service_type: this.serviceType,
 	        cart: this.cart.format(),
 	        include_utensils: include_utensils,
@@ -2354,7 +3603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Order;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2365,11 +3614,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(17);
+	var _lodash = __webpack_require__(18);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _lineItem = __webpack_require__(18);
+	var _lineItem = __webpack_require__(19);
 
 	var _lineItem2 = _interopRequireDefault(_lineItem);
 
@@ -2447,7 +3696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Cart;
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -2464,7 +3713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var undefined;
 
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.14.1';
+	  var VERSION = '4.15.0';
 
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -2586,7 +3835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /**
 	   * Used to match `RegExp`
-	   * [syntax characters](http://ecma-international.org/ecma-262/6.0/#sec-patterns).
+	   * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
 	   */
 	  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g,
 	      reHasRegExpChar = RegExp(reRegExpChar.source);
@@ -2601,15 +3850,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      reWrapDetails = /\{\n\/\* \[wrapped with (.+)\] \*/,
 	      reSplitDetails = /,? & /;
 
-	  /** Used to match non-compound words composed of alphanumeric characters. */
-	  var reBasicWord = /[a-zA-Z0-9]+/g;
+	  /** Used to match words composed of alphanumeric characters. */
+	  var reAsciiWord = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
 
 	  /** Used to match backslashes in property paths. */
 	  var reEscapeChar = /\\(\\)?/g;
 
 	  /**
 	   * Used to match
-	   * [ES template delimiters](http://ecma-international.org/ecma-262/6.0/#sec-template-literal-lexical-components).
+	   * [ES template delimiters](http://ecma-international.org/ecma-262/7.0/#sec-template-literal-lexical-components).
 	   */
 	  var reEsTemplate = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g;
 
@@ -2634,8 +3883,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /** Used to detect unsigned integer values. */
 	  var reIsUint = /^(?:0|[1-9]\d*)$/;
 
-	  /** Used to match latin-1 supplementary letters (excluding mathematical operators). */
-	  var reLatin1 = /[\xc0-\xd6\xd8-\xde\xdf-\xf6\xf8-\xff]/g;
+	  /** Used to match Latin Unicode letters (excluding mathematical operators). */
+	  var reLatin = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g;
 
 	  /** Used to ensure capturing order of template delimiters. */
 	  var reNoMatch = /($^)/;
@@ -2696,10 +3945,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var reComboMark = RegExp(rsCombo, 'g');
 
 	  /** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
-	  var reComplexSymbol = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+	  var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
 
 	  /** Used to match complex or compound words. */
-	  var reComplexWord = RegExp([
+	  var reUnicodeWord = RegExp([
 	    rsUpper + '?' + rsLower + '+' + rsOptLowerContr + '(?=' + [rsBreak, rsUpper, '$'].join('|') + ')',
 	    rsUpperMisc + '+' + rsOptUpperContr + '(?=' + [rsBreak, rsUpper + rsLowerMisc, '$'].join('|') + ')',
 	    rsUpper + '?' + rsLowerMisc + '+' + rsOptLowerContr,
@@ -2709,17 +3958,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ].join('|'), 'g');
 
 	  /** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
-	  var reHasComplexSymbol = RegExp('[' + rsZWJ + rsAstralRange  + rsComboMarksRange + rsComboSymbolsRange + rsVarRange + ']');
+	  var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboMarksRange + rsComboSymbolsRange + rsVarRange + ']');
 
 	  /** Used to detect strings that need a more robust regexp to match words. */
-	  var reHasComplexWord = /[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
+	  var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
 
 	  /** Used to assign default `context` object properties. */
 	  var contextProps = [
 	    'Array', 'Buffer', 'DataView', 'Date', 'Error', 'Float32Array', 'Float64Array',
 	    'Function', 'Int8Array', 'Int16Array', 'Int32Array', 'Map', 'Math', 'Object',
-	    'Promise', 'Reflect', 'RegExp', 'Set', 'String', 'Symbol', 'TypeError',
-	    'Uint8Array', 'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'WeakMap',
+	    'Promise', 'RegExp', 'Set', 'String', 'Symbol', 'TypeError', 'Uint8Array',
+	    'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'WeakMap',
 	    '_', 'clearTimeout', 'isFinite', 'parseInt', 'setTimeout'
 	  ];
 
@@ -2758,16 +4007,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  cloneableTags[errorTag] = cloneableTags[funcTag] =
 	  cloneableTags[weakMapTag] = false;
 
-	  /** Used to map latin-1 supplementary letters to basic latin letters. */
+	  /** Used to map Latin Unicode letters to basic Latin letters. */
 	  var deburredLetters = {
+	    // Latin-1 Supplement block.
 	    '\xc0': 'A',  '\xc1': 'A', '\xc2': 'A', '\xc3': 'A', '\xc4': 'A', '\xc5': 'A',
 	    '\xe0': 'a',  '\xe1': 'a', '\xe2': 'a', '\xe3': 'a', '\xe4': 'a', '\xe5': 'a',
 	    '\xc7': 'C',  '\xe7': 'c',
 	    '\xd0': 'D',  '\xf0': 'd',
 	    '\xc8': 'E',  '\xc9': 'E', '\xca': 'E', '\xcb': 'E',
 	    '\xe8': 'e',  '\xe9': 'e', '\xea': 'e', '\xeb': 'e',
-	    '\xcC': 'I',  '\xcd': 'I', '\xce': 'I', '\xcf': 'I',
-	    '\xeC': 'i',  '\xed': 'i', '\xee': 'i', '\xef': 'i',
+	    '\xcc': 'I',  '\xcd': 'I', '\xce': 'I', '\xcf': 'I',
+	    '\xec': 'i',  '\xed': 'i', '\xee': 'i', '\xef': 'i',
 	    '\xd1': 'N',  '\xf1': 'n',
 	    '\xd2': 'O',  '\xd3': 'O', '\xd4': 'O', '\xd5': 'O', '\xd6': 'O', '\xd8': 'O',
 	    '\xf2': 'o',  '\xf3': 'o', '\xf4': 'o', '\xf5': 'o', '\xf6': 'o', '\xf8': 'o',
@@ -2776,7 +4026,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    '\xdd': 'Y',  '\xfd': 'y', '\xff': 'y',
 	    '\xc6': 'Ae', '\xe6': 'ae',
 	    '\xde': 'Th', '\xfe': 'th',
-	    '\xdf': 'ss'
+	    '\xdf': 'ss',
+	    // Latin Extended-A block.
+	    '\u0100': 'A',  '\u0102': 'A', '\u0104': 'A',
+	    '\u0101': 'a',  '\u0103': 'a', '\u0105': 'a',
+	    '\u0106': 'C',  '\u0108': 'C', '\u010a': 'C', '\u010c': 'C',
+	    '\u0107': 'c',  '\u0109': 'c', '\u010b': 'c', '\u010d': 'c',
+	    '\u010e': 'D',  '\u0110': 'D', '\u010f': 'd', '\u0111': 'd',
+	    '\u0112': 'E',  '\u0114': 'E', '\u0116': 'E', '\u0118': 'E', '\u011a': 'E',
+	    '\u0113': 'e',  '\u0115': 'e', '\u0117': 'e', '\u0119': 'e', '\u011b': 'e',
+	    '\u011c': 'G',  '\u011e': 'G', '\u0120': 'G', '\u0122': 'G',
+	    '\u011d': 'g',  '\u011f': 'g', '\u0121': 'g', '\u0123': 'g',
+	    '\u0124': 'H',  '\u0126': 'H', '\u0125': 'h', '\u0127': 'h',
+	    '\u0128': 'I',  '\u012a': 'I', '\u012c': 'I', '\u012e': 'I', '\u0130': 'I',
+	    '\u0129': 'i',  '\u012b': 'i', '\u012d': 'i', '\u012f': 'i', '\u0131': 'i',
+	    '\u0134': 'J',  '\u0135': 'j',
+	    '\u0136': 'K',  '\u0137': 'k', '\u0138': 'k',
+	    '\u0139': 'L',  '\u013b': 'L', '\u013d': 'L', '\u013f': 'L', '\u0141': 'L',
+	    '\u013a': 'l',  '\u013c': 'l', '\u013e': 'l', '\u0140': 'l', '\u0142': 'l',
+	    '\u0143': 'N',  '\u0145': 'N', '\u0147': 'N', '\u014a': 'N',
+	    '\u0144': 'n',  '\u0146': 'n', '\u0148': 'n', '\u014b': 'n',
+	    '\u014c': 'O',  '\u014e': 'O', '\u0150': 'O',
+	    '\u014d': 'o',  '\u014f': 'o', '\u0151': 'o',
+	    '\u0154': 'R',  '\u0156': 'R', '\u0158': 'R',
+	    '\u0155': 'r',  '\u0157': 'r', '\u0159': 'r',
+	    '\u015a': 'S',  '\u015c': 'S', '\u015e': 'S', '\u0160': 'S',
+	    '\u015b': 's',  '\u015d': 's', '\u015f': 's', '\u0161': 's',
+	    '\u0162': 'T',  '\u0164': 'T', '\u0166': 'T',
+	    '\u0163': 't',  '\u0165': 't', '\u0167': 't',
+	    '\u0168': 'U',  '\u016a': 'U', '\u016c': 'U', '\u016e': 'U', '\u0170': 'U', '\u0172': 'U',
+	    '\u0169': 'u',  '\u016b': 'u', '\u016d': 'u', '\u016f': 'u', '\u0171': 'u', '\u0173': 'u',
+	    '\u0174': 'W',  '\u0175': 'w',
+	    '\u0176': 'Y',  '\u0177': 'y', '\u0178': 'Y',
+	    '\u0179': 'Z',  '\u017b': 'Z', '\u017d': 'Z',
+	    '\u017a': 'z',  '\u017c': 'z', '\u017e': 'z',
+	    '\u0132': 'IJ', '\u0133': 'ij',
+	    '\u0152': 'Oe', '\u0153': 'oe',
+	    '\u0149': "'n", '\u017f': 'ss'
 	  };
 
 	  /** Used to map characters to HTML entities. */
@@ -3012,7 +4298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * specifying an index to search from.
 	   *
 	   * @private
-	   * @param {Array} [array] The array to search.
+	   * @param {Array} [array] The array to inspect.
 	   * @param {*} target The value to search for.
 	   * @returns {boolean} Returns `true` if `target` is found, else `false`.
 	   */
@@ -3025,7 +4311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * This function is like `arrayIncludes` except that it accepts a comparator.
 	   *
 	   * @private
-	   * @param {Array} [array] The array to search.
+	   * @param {Array} [array] The array to inspect.
 	   * @param {*} target The value to search for.
 	   * @param {Function} comparator The comparator invoked per element.
 	   * @returns {boolean} Returns `true` if `target` is found, else `false`.
@@ -3152,12 +4438,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  /**
+	   * Gets the size of an ASCII `string`.
+	   *
+	   * @private
+	   * @param {string} string The string inspect.
+	   * @returns {number} Returns the string size.
+	   */
+	  var asciiSize = baseProperty('length');
+
+	  /**
+	   * Converts an ASCII `string` to an array.
+	   *
+	   * @private
+	   * @param {string} string The string to convert.
+	   * @returns {Array} Returns the converted array.
+	   */
+	  function asciiToArray(string) {
+	    return string.split('');
+	  }
+
+	  /**
+	   * Splits an ASCII `string` into an array of its words.
+	   *
+	   * @private
+	   * @param {string} The string to inspect.
+	   * @returns {Array} Returns the words of `string`.
+	   */
+	  function asciiWords(string) {
+	    return string.match(reAsciiWord) || [];
+	  }
+
+	  /**
 	   * The base implementation of methods like `_.findKey` and `_.findLastKey`,
 	   * without support for iteratee shorthands, which iterates over `collection`
 	   * using `eachFunc`.
 	   *
 	   * @private
-	   * @param {Array|Object} collection The collection to search.
+	   * @param {Array|Object} collection The collection to inspect.
 	   * @param {Function} predicate The function invoked per iteration.
 	   * @param {Function} eachFunc The function to iterate over `collection`.
 	   * @returns {*} Returns the found element or its key, else `undefined`.
@@ -3178,7 +4495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * support for iteratee shorthands.
 	   *
 	   * @private
-	   * @param {Array} array The array to search.
+	   * @param {Array} array The array to inspect.
 	   * @param {Function} predicate The function invoked per iteration.
 	   * @param {number} fromIndex The index to search from.
 	   * @param {boolean} [fromRight] Specify iterating from right to left.
@@ -3200,7 +4517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
 	   *
 	   * @private
-	   * @param {Array} array The array to search.
+	   * @param {Array} array The array to inspect.
 	   * @param {*} value The value to search for.
 	   * @param {number} fromIndex The index to search from.
 	   * @returns {number} Returns the index of the matched value, else `-1`.
@@ -3224,7 +4541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * This function is like `baseIndexOf` except that it accepts a comparator.
 	   *
 	   * @private
-	   * @param {Array} array The array to search.
+	   * @param {Array} array The array to inspect.
 	   * @param {*} value The value to search for.
 	   * @param {number} fromIndex The index to search from.
 	   * @param {Function} comparator The comparator invoked per element.
@@ -3487,7 +4804,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  /**
-	   * Used by `_.deburr` to convert latin-1 supplementary letters to basic latin letters.
+	   * Used by `_.deburr` to convert Latin-1 Supplement and Latin Extended-A
+	   * letters to basic Latin letters.
 	   *
 	   * @private
 	   * @param {string} letter The matched letter to deburr.
@@ -3525,6 +4843,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  function getValue(object, key) {
 	    return object == null ? undefined : object[key];
+	  }
+
+	  /**
+	   * Checks if `string` contains Unicode symbols.
+	   *
+	   * @private
+	   * @param {string} string The string to inspect.
+	   * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+	   */
+	  function hasUnicode(string) {
+	    return reHasUnicode.test(string);
+	  }
+
+	  /**
+	   * Checks if `string` contains a word composed of Unicode symbols.
+	   *
+	   * @private
+	   * @param {string} string The string to inspect.
+	   * @returns {boolean} Returns `true` if a word is found, else `false`.
+	   */
+	  function hasUnicodeWord(string) {
+	    return reHasUnicodeWord.test(string);
 	  }
 
 	  /**
@@ -3581,7 +4921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  /**
-	   * Creates a function that invokes `func` with its first argument transformed.
+	   * Creates a unary function that invokes `func` with its argument transformed.
 	   *
 	   * @private
 	   * @param {Function} func The function to wrap.
@@ -3661,14 +5001,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @returns {number} Returns the string size.
 	   */
 	  function stringSize(string) {
-	    if (!(string && reHasComplexSymbol.test(string))) {
-	      return string.length;
-	    }
-	    var result = reComplexSymbol.lastIndex = 0;
-	    while (reComplexSymbol.test(string)) {
-	      result++;
-	    }
-	    return result;
+	    return hasUnicode(string)
+	      ? unicodeSize(string)
+	      : asciiSize(string);
 	  }
 
 	  /**
@@ -3679,7 +5014,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @returns {Array} Returns the converted array.
 	   */
 	  function stringToArray(string) {
-	    return string.match(reComplexSymbol);
+	    return hasUnicode(string)
+	      ? unicodeToArray(string)
+	      : asciiToArray(string);
 	  }
 
 	  /**
@@ -3690,6 +5027,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @returns {string} Returns the unescaped character.
 	   */
 	  var unescapeHtmlChar = basePropertyOf(htmlUnescapes);
+
+	  /**
+	   * Gets the size of a Unicode `string`.
+	   *
+	   * @private
+	   * @param {string} string The string inspect.
+	   * @returns {number} Returns the string size.
+	   */
+	  function unicodeSize(string) {
+	    var result = reUnicode.lastIndex = 0;
+	    while (reUnicode.test(string)) {
+	      result++;
+	    }
+	    return result;
+	  }
+
+	  /**
+	   * Converts a Unicode `string` to an array.
+	   *
+	   * @private
+	   * @param {string} string The string to convert.
+	   * @returns {Array} Returns the converted array.
+	   */
+	  function unicodeToArray(string) {
+	    return string.match(reUnicode) || [];
+	  }
+
+	  /**
+	   * Splits a Unicode `string` into an array of its words.
+	   *
+	   * @private
+	   * @param {string} The string to inspect.
+	   * @returns {Array} Returns the words of `string`.
+	   */
+	  function unicodeWords(string) {
+	    return string.match(reUnicodeWord) || [];
+	  }
 
 	  /*--------------------------------------------------------------------------*/
 
@@ -3730,20 +5104,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * var defer = _.runInContext({ 'setTimeout': setImmediate }).defer;
 	   */
 	  function runInContext(context) {
-	    context = context ? _.defaults({}, context, _.pick(root, contextProps)) : root;
+	    context = context ? _.defaults(root.Object(), context, _.pick(root, contextProps)) : root;
 
 	    /** Built-in constructor references. */
 	    var Array = context.Array,
 	        Date = context.Date,
 	        Error = context.Error,
+	        Function = context.Function,
 	        Math = context.Math,
+	        Object = context.Object,
 	        RegExp = context.RegExp,
+	        String = context.String,
 	        TypeError = context.TypeError;
 
 	    /** Used for built-in method references. */
-	    var arrayProto = context.Array.prototype,
-	        objectProto = context.Object.prototype,
-	        stringProto = context.String.prototype;
+	    var arrayProto = Array.prototype,
+	        funcProto = Function.prototype,
+	        objectProto = Object.prototype;
 
 	    /** Used to detect overreaching core-js shims. */
 	    var coreJsData = context['__core-js_shared__'];
@@ -3755,7 +5132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }());
 
 	    /** Used to resolve the decompiled source of functions. */
-	    var funcToString = context.Function.prototype.toString;
+	    var funcToString = funcProto.toString;
 
 	    /** Used to check objects for own properties. */
 	    var hasOwnProperty = objectProto.hasOwnProperty;
@@ -3768,7 +5145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Used to resolve the
-	     * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	     * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	     * of values.
 	     */
 	    var objectToString = objectProto.toString;
@@ -3784,36 +5161,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /** Built-in value references. */
 	    var Buffer = moduleExports ? context.Buffer : undefined,
-	        Reflect = context.Reflect,
 	        Symbol = context.Symbol,
 	        Uint8Array = context.Uint8Array,
-	        enumerate = Reflect ? Reflect.enumerate : undefined,
+	        getPrototype = overArg(Object.getPrototypeOf, Object),
 	        iteratorSymbol = Symbol ? Symbol.iterator : undefined,
-	        objectCreate = context.Object.create,
+	        objectCreate = Object.create,
 	        propertyIsEnumerable = objectProto.propertyIsEnumerable,
 	        splice = arrayProto.splice,
 	        spreadableSymbol = Symbol ? Symbol.isConcatSpreadable : undefined;
 
-	    /** Built-in method references that are mockable. */
-	    var clearTimeout = function(id) { return context.clearTimeout.call(root, id); },
-	        setTimeout = function(func, wait) { return context.setTimeout.call(root, func, wait); };
+	    /** Mocked built-ins. */
+	    var ctxClearTimeout = context.clearTimeout !== root.clearTimeout && context.clearTimeout,
+	        ctxNow = Date && Date.now !== root.Date.now && Date.now,
+	        ctxSetTimeout = context.setTimeout !== root.setTimeout && context.setTimeout;
 
 	    /* Built-in method references for those with the same name as other `lodash` methods. */
 	    var nativeCeil = Math.ceil,
 	        nativeFloor = Math.floor,
-	        nativeGetPrototype = Object.getPrototypeOf,
 	        nativeGetSymbols = Object.getOwnPropertySymbols,
 	        nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
 	        nativeIsFinite = context.isFinite,
 	        nativeJoin = arrayProto.join,
-	        nativeKeys = Object.keys,
+	        nativeKeys = overArg(Object.keys, Object),
 	        nativeMax = Math.max,
 	        nativeMin = Math.min,
 	        nativeParseInt = context.parseInt,
 	        nativeRandom = Math.random,
-	        nativeReplace = stringProto.replace,
-	        nativeReverse = arrayProto.reverse,
-	        nativeSplit = stringProto.split;
+	        nativeReverse = arrayProto.reverse;
 
 	    /* Built-in method references that are verified to be native. */
 	    var DataView = getNative(context, 'DataView'),
@@ -3821,11 +5195,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Promise = getNative(context, 'Promise'),
 	        Set = getNative(context, 'Set'),
 	        WeakMap = getNative(context, 'WeakMap'),
-	        nativeCreate = getNative(context.Object, 'create');
+	        nativeCreate = getNative(Object, 'create');
 
 	    /* Used to set `toString` methods. */
 	    var defineProperty = (function() {
-	      var func = getNative(context.Object, 'defineProperty'),
+	      var func = getNative(Object, 'defineProperty'),
 	          name = getNative.name;
 
 	      return (name && name.length > 2) ? func : undefined;
@@ -4654,6 +6028,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /*------------------------------------------------------------------------*/
 
 	    /**
+	     * Creates an array of the enumerable property names of the array-like `value`.
+	     *
+	     * @private
+	     * @param {*} value The value to query.
+	     * @param {boolean} inherited Specify returning inherited property names.
+	     * @returns {Array} Returns the array of property names.
+	     */
+	    function arrayLikeKeys(value, inherited) {
+	      // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+	      // Safari 9 makes `arguments.length` enumerable in strict mode.
+	      var result = (isArray(value) || isArguments(value))
+	        ? baseTimes(value.length, String)
+	        : [];
+
+	      var length = result.length,
+	          skipIndexes = !!length;
+
+	      for (var key in value) {
+	        if ((inherited || hasOwnProperty.call(value, key)) &&
+	            !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
+	          result.push(key);
+	        }
+	      }
+	      return result;
+	    }
+
+	    /**
 	     * Used by `_.defaults` to customize its `_.assignIn` use.
 	     *
 	     * @private
@@ -4689,7 +6090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Assigns `value` to `key` of `object` if the existing value is not equivalent
-	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons.
 	     *
 	     * @private
@@ -4709,7 +6110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Gets the index at which the `key` is found in `array` of key-value pairs.
 	     *
 	     * @private
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {*} key The key to search for.
 	     * @returns {number} Returns the index of the matched value, else `-1`.
 	     */
@@ -4897,14 +6298,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (object == null) {
 	        return !length;
 	      }
-	      var index = length;
-	      while (index--) {
-	        var key = props[index],
+	      object = Object(object);
+	      while (length--) {
+	        var key = props[length],
 	            predicate = source[key],
 	            value = object[key];
 
-	        if ((value === undefined &&
-	            !(key in Object(object))) || !predicate(value)) {
+	        if ((value === undefined && !(key in object)) || !predicate(value)) {
 	          return false;
 	        }
 	      }
@@ -4931,7 +6331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Function} func The function to delay.
 	     * @param {number} wait The number of milliseconds to delay invocation.
 	     * @param {Array} args The arguments to provide to `func`.
-	     * @returns {number} Returns the timer id.
+	     * @returns {number|Object} Returns the timer id or timeout object.
 	     */
 	    function baseDelay(func, wait, args) {
 	      if (typeof func != 'function') {
@@ -5276,12 +6676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {boolean} Returns `true` if `key` exists, else `false`.
 	     */
 	    function baseHas(object, key) {
-	      // Avoid a bug in IE 10-11 where objects with a [[Prototype]] of `null`,
-	      // that are composed entirely of index properties, return `false` for
-	      // `hasOwnProperty` checks of them.
-	      return object != null &&
-	        (hasOwnProperty.call(object, key) ||
-	          (typeof object == 'object' && key in object && getPrototype(object) === null));
+	      return object != null && hasOwnProperty.call(object, key);
 	    }
 
 	    /**
@@ -5655,38 +7050,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * The base implementation of `_.keys` which doesn't skip the constructor
-	     * property of prototypes or treat sparse arrays as dense.
+	     * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
 	     *
 	     * @private
 	     * @param {Object} object The object to query.
 	     * @returns {Array} Returns the array of property names.
 	     */
-	    var baseKeys = overArg(nativeKeys, Object);
+	    function baseKeys(object) {
+	      if (!isPrototype(object)) {
+	        return nativeKeys(object);
+	      }
+	      var result = [];
+	      for (var key in Object(object)) {
+	        if (hasOwnProperty.call(object, key) && key != 'constructor') {
+	          result.push(key);
+	        }
+	      }
+	      return result;
+	    }
 
 	    /**
-	     * The base implementation of `_.keysIn` which doesn't skip the constructor
-	     * property of prototypes or treat sparse arrays as dense.
+	     * The base implementation of `_.keysIn` which doesn't treat sparse arrays as dense.
 	     *
 	     * @private
 	     * @param {Object} object The object to query.
 	     * @returns {Array} Returns the array of property names.
 	     */
 	    function baseKeysIn(object) {
-	      object = object == null ? object : Object(object);
+	      if (!isObject(object)) {
+	        return nativeKeysIn(object);
+	      }
+	      var isProto = isPrototype(object),
+	          result = [];
 
-	      var result = [];
 	      for (var key in object) {
-	        result.push(key);
+	        if (!(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
+	          result.push(key);
+	        }
 	      }
 	      return result;
-	    }
-
-	    // Fallback for IE < 9 with es6-shim.
-	    if (enumerate && !propertyIsEnumerable.call({ 'valueOf': 1 }, 'valueOf')) {
-	      baseKeysIn = function(object) {
-	        return iteratorToArray(enumerate(object));
-	      };
 	    }
 
 	    /**
@@ -5773,7 +7175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	      if (!(isArray(source) || isTypedArray(source))) {
-	        var props = keysIn(source);
+	        var props = baseKeysIn(source);
 	      }
 	      arrayEach(props || source, function(srcValue, key) {
 	        if (props) {
@@ -6133,13 +7535,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * The base implementation of `_.set`.
 	     *
 	     * @private
-	     * @param {Object} object The object to query.
+	     * @param {Object} object The object to modify.
 	     * @param {Array|string} path The path of the property to set.
 	     * @param {*} value The value to set.
 	     * @param {Function} [customizer] The function to customize path creation.
 	     * @returns {Object} Returns `object`.
 	     */
 	    function baseSet(object, path, value, customizer) {
+	      if (!isObject(object)) {
+	        return object;
+	      }
 	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
@@ -6148,20 +7553,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	          nested = object;
 
 	      while (nested != null && ++index < length) {
-	        var key = toKey(path[index]);
-	        if (isObject(nested)) {
-	          var newValue = value;
-	          if (index != lastIndex) {
-	            var objValue = nested[key];
-	            newValue = customizer ? customizer(objValue, key, nested) : undefined;
-	            if (newValue === undefined) {
-	              newValue = objValue == null
-	                ? (isIndex(path[index + 1]) ? [] : {})
-	                : objValue;
-	            }
+	        var key = toKey(path[index]),
+	            newValue = value;
+
+	        if (index != lastIndex) {
+	          var objValue = nested[key];
+	          newValue = customizer ? customizer(objValue, key, nested) : undefined;
+	          if (newValue === undefined) {
+	            newValue = isObject(objValue)
+	              ? objValue
+	              : (isIndex(path[index + 1]) ? [] : {});
 	          }
-	          assignValue(nested, key, newValue);
 	        }
+	        assignValue(nested, key, newValue);
 	        nested = nested[key];
 	      }
 	      return object;
@@ -6454,14 +7858,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      object = parent(object, path);
 
 	      var key = toKey(last(path));
-	      return !(object != null && baseHas(object, key)) || delete object[key];
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 
 	    /**
 	     * The base implementation of `_.update`.
 	     *
 	     * @private
-	     * @param {Object} object The object to query.
+	     * @param {Object} object The object to modify.
 	     * @param {Array|string} path The path of the property to update.
 	     * @param {Function} updater The function to produce the updated value.
 	     * @param {Function} [customizer] The function to customize path creation.
@@ -6608,6 +8012,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      end = end === undefined ? length : end;
 	      return (!start && end >= length) ? array : baseSlice(array, start, end);
 	    }
+
+	    /**
+	     * A simple wrapper around the global [`clearTimeout`](https://mdn.io/clearTimeout).
+	     *
+	     * @private
+	     * @param {number|Object} id The timer id or timeout object of the timer to clear.
+	     */
+	    var clearTimeout = ctxClearTimeout || function(id) {
+	      return root.clearTimeout(id);
+	    };
 
 	    /**
 	     * Creates a clone of  `buffer`.
@@ -7062,7 +8476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return function(string) {
 	        string = toString(string);
 
-	        var strSymbols = reHasComplexSymbol.test(string)
+	        var strSymbols = hasUnicode(string)
 	          ? stringToArray(string)
 	          : undefined;
 
@@ -7102,7 +8516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function createCtor(Ctor) {
 	      return function() {
 	        // Use a `switch` statement to work with class constructors. See
-	        // http://ecma-international.org/ecma-262/6.0/#sec-ecmascript-function-objects-call-thisargument-argumentslist
+	        // http://ecma-international.org/ecma-262/7.0/#sec-ecmascript-function-objects-call-thisargument-argumentslist
 	        // for more details.
 	        var args = arguments;
 	        switch (args.length) {
@@ -7405,7 +8819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return charsLength ? baseRepeat(chars, length) : chars;
 	      }
 	      var result = baseRepeat(chars, nativeCeil(length / stringSize(chars)));
-	      return reHasComplexSymbol.test(chars)
+	      return hasUnicode(chars)
 	        ? castSlice(stringToArray(result), 0, length).join('')
 	        : result.slice(0, length);
 	    }
@@ -7790,7 +9204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case regexpTag:
 	        case stringTag:
 	          // Coerce regexes to strings and treat strings, primitives and objects,
-	          // as equal. See http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype.tostring
+	          // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
 	          // for more details.
 	          return object == (other + '');
 
@@ -7852,7 +9266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var index = objLength;
 	      while (index--) {
 	        var key = objProps[index];
-	        if (!(isPartial ? key in other : baseHas(other, key))) {
+	        if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
 	          return false;
 	        }
 	      }
@@ -7989,19 +9403,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Gets the "length" property value of `object`.
-	     *
-	     * **Note:** This function is used to avoid a
-	     * [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792) that affects
-	     * Safari on at least iOS 8.1-8.3 ARM64.
-	     *
-	     * @private
-	     * @param {Object} object The object to query.
-	     * @returns {*} Returns the "length" value.
-	     */
-	    var getLength = baseProperty('length');
-
-	    /**
 	     * Gets the data for `map`.
 	     *
 	     * @private
@@ -8050,15 +9451,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Gets the `[[Prototype]]` of `value`.
-	     *
-	     * @private
-	     * @param {*} value The value to query.
-	     * @returns {null|Object} Returns the `[[Prototype]]`.
-	     */
-	    var getPrototype = overArg(nativeGetPrototype, Object);
-
-	    /**
 	     * Creates an array of the own enumerable symbol properties of `object`.
 	     *
 	     * @private
@@ -8094,7 +9486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var getTag = baseGetTag;
 
 	    // Fallback for data views, maps, sets, and weak maps in IE 11,
-	    // for data views in Edge, and promises in Node.js.
+	    // for data views in Edge < 14, and promises in Node.js.
 	    if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 	        (Map && getTag(new Map) != mapTag) ||
 	        (Promise && getTag(Promise.resolve()) != promiseTag) ||
@@ -8186,7 +9578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      var length = object ? object.length : 0;
 	      return !!length && isLength(length) && isIndex(key, length) &&
-	        (isArray(object) || isString(object) || isArguments(object));
+	        (isArray(object) || isArguments(object));
 	    }
 
 	    /**
@@ -8268,23 +9660,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case symbolTag:
 	          return cloneSymbol(object);
 	      }
-	    }
-
-	    /**
-	     * Creates an array of index keys for `object` values of arrays,
-	     * `arguments` objects, and strings, otherwise `null` is returned.
-	     *
-	     * @private
-	     * @param {Object} object The object to query.
-	     * @returns {Array|null} Returns index keys, else `null`.
-	     */
-	    function indexKeys(object) {
-	      var length = object ? object.length : undefined;
-	      if (isLength(length) &&
-	          (isArray(object) || isString(object) || isArguments(object))) {
-	        return baseTimes(length, String);
-	      }
-	      return null;
 	    }
 
 	    /**
@@ -8572,6 +9947,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
+	     * This function is like
+	     * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+	     * except that it includes inherited enumerable properties.
+	     *
+	     * @private
+	     * @param {Object} object The object to query.
+	     * @returns {Array} Returns the array of property names.
+	     */
+	    function nativeKeysIn(object) {
+	      var result = [];
+	      if (object != null) {
+	        for (var key in Object(object)) {
+	          result.push(key);
+	        }
+	      }
+	      return result;
+	    }
+
+	    /**
 	     * Gets the parent value at `path` of `object`.
 	     *
 	     * @private
@@ -8638,6 +10032,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return baseSetData(key, value);
 	      };
 	    }());
+
+	    /**
+	     * A simple wrapper around the global [`setTimeout`](https://mdn.io/setTimeout).
+	     *
+	     * @private
+	     * @param {Function} func The function to delay.
+	     * @param {number} wait The number of milliseconds to delay invocation.
+	     * @returns {number|Object} Returns the timer id or timeout object.
+	     */
+	    var setTimeout = ctxSetTimeout || function(func, wait) {
+	      return root.setTimeout(func, wait);
+	    };
 
 	    /**
 	     * Sets the `toString` method of `wrapper` to mimic the source of `reference`
@@ -8859,7 +10265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Creates an array of `array` values not included in the other given arrays
-	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons. The order of result values is determined by the
 	     * order they occur in the first array.
 	     *
@@ -9153,7 +10559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 1.1.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {Function} [predicate=_.identity]
 	     *  The function invoked per iteration.
 	     * @param {number} [fromIndex=0] The index to search from.
@@ -9201,7 +10607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 2.0.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {Function} [predicate=_.identity]
 	     *  The function invoked per iteration.
 	     * @param {number} [fromIndex=array.length-1] The index to search from.
@@ -9362,7 +10768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Gets the index at which the first occurrence of `value` is found in `array`
-	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons. If `fromIndex` is negative, it's used as the
 	     * offset from the end of `array`.
 	     *
@@ -9370,7 +10776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 0.1.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {*} value The value to search for.
 	     * @param {number} [fromIndex=0] The index to search from.
 	     * @returns {number} Returns the index of the matched value, else `-1`.
@@ -9410,12 +10816,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => [1, 2]
 	     */
 	    function initial(array) {
-	      return dropRight(array, 1);
+	      var length = array ? array.length : 0;
+	      return length ? baseSlice(array, 0, -1) : [];
 	    }
 
 	    /**
 	     * Creates an array of unique values that are included in all given arrays
-	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons. The order of result values is determined by the
 	     * order they occur in the first array.
 	     *
@@ -9554,7 +10961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 0.1.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {*} value The value to search for.
 	     * @param {number} [fromIndex=array.length-1] The index to search from.
 	     * @returns {number} Returns the index of the matched value, else `-1`.
@@ -9619,7 +11026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Removes all given values from `array` using
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons.
 	     *
 	     * **Note:** Unlike `_.without`, this method mutates `array`. Use `_.remove`
@@ -9932,7 +11339,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 4.0.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {*} value The value to search for.
 	     * @returns {number} Returns the index of the matched value, else `-1`.
 	     * @example
@@ -10011,7 +11418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 4.0.0
 	     * @category Array
-	     * @param {Array} array The array to search.
+	     * @param {Array} array The array to inspect.
 	     * @param {*} value The value to search for.
 	     * @returns {number} Returns the index of the matched value, else `-1`.
 	     * @example
@@ -10088,7 +11495,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => [2, 3]
 	     */
 	    function tail(array) {
-	      return drop(array, 1);
+	      var length = array ? array.length : 0;
+	      return length ? baseSlice(array, 1, length) : [];
 	    }
 
 	    /**
@@ -10245,7 +11653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Creates an array of unique values, in order, from all given arrays using
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons.
 	     *
 	     * @static
@@ -10326,7 +11734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Creates a duplicate-free version of an array, using
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons, in which only the first occurrence of each
 	     * element is kept.
 	     *
@@ -10471,7 +11879,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Creates an array excluding all given values using
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * for equality comparisons.
 	     *
 	     * **Note:** Unlike `_.pull`, this method returns a new array.
@@ -11042,6 +12450,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Iteration is stopped once `predicate` returns falsey. The predicate is
 	     * invoked with three arguments: (value, index|key, collection).
 	     *
+	     * **Note:** This method returns `true` for
+	     * [empty collections](https://en.wikipedia.org/wiki/Empty_set) because
+	     * [everything is true](https://en.wikipedia.org/wiki/Vacuous_truth) of
+	     * elements of empty collections.
+	     *
 	     * @static
 	     * @memberOf _
 	     * @since 0.1.0
@@ -11134,7 +12547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 0.1.0
 	     * @category Collection
-	     * @param {Array|Object} collection The collection to search.
+	     * @param {Array|Object} collection The collection to inspect.
 	     * @param {Function} [predicate=_.identity]
 	     *  The function invoked per iteration.
 	     * @param {number} [fromIndex=0] The index to search from.
@@ -11172,7 +12585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 2.0.0
 	     * @category Collection
-	     * @param {Array|Object} collection The collection to search.
+	     * @param {Array|Object} collection The collection to inspect.
 	     * @param {Function} [predicate=_.identity]
 	     *  The function invoked per iteration.
 	     * @param {number} [fromIndex=collection.length-1] The index to search from.
@@ -11359,7 +12772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Checks if `value` is in `collection`. If `collection` is a string, it's
 	     * checked for a substring of `value`, otherwise
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * is used for equality comparisons. If `fromIndex` is negative, it's used as
 	     * the offset from the end of `collection`.
 	     *
@@ -11367,7 +12780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 0.1.0
 	     * @category Collection
-	     * @param {Array|Object|string} collection The collection to search.
+	     * @param {Array|Object|string} collection The collection to inspect.
 	     * @param {*} value The value to search for.
 	     * @param {number} [fromIndex=0] The index to search from.
 	     * @param- {Object} [guard] Enables use as an iteratee for methods like `_.reduce`.
@@ -11800,7 +13213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 0.1.0
 	     * @category Collection
-	     * @param {Array|Object} collection The collection to inspect.
+	     * @param {Array|Object|string} collection The collection to inspect.
 	     * @returns {number} Returns the collection size.
 	     * @example
 	     *
@@ -11818,16 +13231,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return 0;
 	      }
 	      if (isArrayLike(collection)) {
-	        var result = collection.length;
-	        return (result && isString(collection)) ? stringSize(collection) : result;
+	        return isString(collection) ? stringSize(collection) : collection.length;
 	      }
-	      if (isObjectLike(collection)) {
-	        var tag = getTag(collection);
-	        if (tag == mapTag || tag == setTag) {
-	          return collection.size;
-	        }
+	      var tag = getTag(collection);
+	      if (tag == mapTag || tag == setTag) {
+	        return collection.size;
 	      }
-	      return keys(collection).length;
+	      return baseKeys(collection).length;
 	    }
 
 	    /**
@@ -11939,9 +13349,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * }, _.now());
 	     * // => Logs the number of milliseconds it took for the deferred invocation.
 	     */
-	    function now() {
-	      return Date.now();
-	    }
+	    var now = ctxNow || function() {
+	      return root.Date.now();
+	    };
 
 	    /*------------------------------------------------------------------------*/
 
@@ -12482,7 +13892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * **Note:** The cache is exposed as the `cache` property on the memoized
 	     * function. Its creation may be customized by replacing the `_.memoize.Cache`
 	     * constructor with one whose instances implement the
-	     * [`Map`](http://ecma-international.org/ecma-262/6.0/#sec-properties-of-the-map-prototype-object)
+	     * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
 	     * method interface of `delete`, `get`, `has`, and `set`.
 	     *
 	     * @static
@@ -12782,7 +14192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Creates a function that invokes `func` with the `this` binding of the
 	     * create function and an array of arguments much like
-	     * [`Function#apply`](http://www.ecma-international.org/ecma-262/6.0/#sec-function.prototype.apply).
+	     * [`Function#apply`](http://www.ecma-international.org/ecma-262/7.0/#sec-function.prototype.apply).
 	     *
 	     * **Note:** This method is based on the
 	     * [spread operator](https://mdn.io/spread_operator).
@@ -13129,7 +14539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Performs a
-	     * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	     * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
 	     * comparison between two values to determine if they are equivalent.
 	     *
 	     * @static
@@ -13234,7 +14644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => false
 	     */
 	    function isArguments(value) {
-	      // Safari 8.1 incorrectly makes `arguments.callee` enumerable in strict mode.
+	      // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
 	      return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
 	        (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
 	    }
@@ -13309,7 +14719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => false
 	     */
 	    function isArrayLike(value) {
-	      return value != null && isLength(getLength(value)) && !isFunction(value);
+	      return value != null && isLength(value.length) && !isFunction(value);
 	    }
 
 	    /**
@@ -13409,8 +14819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @since 0.1.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is a DOM element,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is a DOM element, else `false`.
 	     * @example
 	     *
 	     * _.isElement(document.body);
@@ -13458,22 +14867,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    function isEmpty(value) {
 	      if (isArrayLike(value) &&
-	          (isArray(value) || isString(value) || isFunction(value.splice) ||
-	            isArguments(value) || isBuffer(value))) {
+	          (isArray(value) || typeof value == 'string' ||
+	            typeof value.splice == 'function' || isBuffer(value) || isArguments(value))) {
 	        return !value.length;
 	      }
-	      if (isObjectLike(value)) {
-	        var tag = getTag(value);
-	        if (tag == mapTag || tag == setTag) {
-	          return !value.size;
-	        }
+	      var tag = getTag(value);
+	      if (tag == mapTag || tag == setTag) {
+	        return !value.size;
+	      }
+	      if (nonEnumShadows || isPrototype(value)) {
+	        return !nativeKeys(value).length;
 	      }
 	      for (var key in value) {
 	        if (hasOwnProperty.call(value, key)) {
 	          return false;
 	        }
 	      }
-	      return !(nonEnumShadows && keys(value).length);
+	      return true;
 	    }
 
 	    /**
@@ -13492,8 +14902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @category Lang
 	     * @param {*} value The value to compare.
 	     * @param {*} other The other value to compare.
-	     * @returns {boolean} Returns `true` if the values are equivalent,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
 	     * @example
 	     *
 	     * var object = { 'a': 1 };
@@ -13522,8 +14931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {*} value The value to compare.
 	     * @param {*} other The other value to compare.
 	     * @param {Function} [customizer] The function to customize comparisons.
-	     * @returns {boolean} Returns `true` if the values are equivalent,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
 	     * @example
 	     *
 	     * function isGreeting(value) {
@@ -13557,8 +14965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @since 3.0.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is an error object,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is an error object, else `false`.
 	     * @example
 	     *
 	     * _.isError(new Error);
@@ -13586,8 +14993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @since 0.1.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is a finite number,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is a finite number, else `false`.
 	     * @example
 	     *
 	     * _.isFinite(3);
@@ -13625,8 +15031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    function isFunction(value) {
 	      // The use of `Object#toString` avoids issues with the `typeof` operator
-	      // in Safari 8 which returns 'object' for typed array and weak map constructors,
-	      // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	      // in Safari 8-9 which returns 'object' for typed array and other constructors.
 	      var tag = isObject(value) ? objectToString.call(value) : '';
 	      return tag == funcTag || tag == genTag;
 	    }
@@ -13664,16 +15069,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Checks if `value` is a valid array-like length.
 	     *
-	     * **Note:** This function is loosely based on
-	     * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+	     * **Note:** This method is loosely based on
+	     * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
 	     *
 	     * @static
 	     * @memberOf _
 	     * @since 4.0.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is a valid length,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
 	     * @example
 	     *
 	     * _.isLength(3);
@@ -13695,7 +15099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Checks if `value` is the
-	     * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	     * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
 	     * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	     *
 	     * @static
@@ -13774,8 +15178,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Performs a partial deep comparison between `object` and `source` to
 	     * determine if `object` contains equivalent property values.
 	     *
-	     * **Note:** This method supports comparing the same values as `_.isEqual`
-	     * and is equivalent to `_.matches` when `source` is partially applied.
+	     * **Note:** This method is equivalent to `_.matches` when `source` is
+	     * partially applied.
+	     *
+	     * Partial comparisons will match empty array and empty object `source`
+	     * values against any array or object value, respectively. See `_.isEqual`
+	     * for a list of supported value comparisons.
 	     *
 	     * @static
 	     * @memberOf _
@@ -13988,8 +15396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @since 0.8.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is a plain object,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
 	     * @example
 	     *
 	     * function Foo() {
@@ -14053,8 +15460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @since 4.0.0
 	     * @category Lang
 	     * @param {*} value The value to check.
-	     * @returns {boolean} Returns `true` if `value` is a safe integer,
-	     *  else `false`.
+	     * @returns {boolean} Returns `true` if `value` is a safe integer, else `false`.
 	     * @example
 	     *
 	     * _.isSafeInteger(3);
@@ -14348,7 +15754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Converts `value` to an integer.
 	     *
 	     * **Note:** This method is loosely based on
-	     * [`ToInteger`](http://www.ecma-international.org/ecma-262/6.0/#sec-tointeger).
+	     * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
 	     *
 	     * @static
 	     * @memberOf _
@@ -14382,7 +15788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * array-like object.
 	     *
 	     * **Note:** This method is based on
-	     * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+	     * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
 	     *
 	     * @static
 	     * @memberOf _
@@ -14439,7 +15845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return NAN;
 	      }
 	      if (isObject(value)) {
-	        var other = isFunction(value.valueOf) ? value.valueOf() : value;
+	        var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
 	        value = isObject(other) ? (other + '') : other;
 	      }
 	      if (typeof value != 'string') {
@@ -14611,13 +16017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => { 'a': 1, 'b': 2, 'c': 3, 'd': 4 }
 	     */
 	    var assignIn = createAssigner(function(object, source) {
-	      if (nonEnumShadows || isPrototype(source) || isArrayLike(source)) {
-	        copyObject(source, keysIn(source), object);
-	        return;
-	      }
-	      for (var key in source) {
-	        assignValue(object, key, source[key]);
-	      }
+	      copyObject(source, keysIn(source), object);
 	    });
 
 	    /**
@@ -14803,7 +16203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 1.1.0
 	     * @category Object
-	     * @param {Object} object The object to search.
+	     * @param {Object} object The object to inspect.
 	     * @param {Function} [predicate=_.identity] The function invoked per iteration.
 	     * @returns {string|undefined} Returns the key of the matched element,
 	     *  else `undefined`.
@@ -14842,7 +16242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 2.0.0
 	     * @category Object
-	     * @param {Object} object The object to search.
+	     * @param {Object} object The object to inspect.
 	     * @param {Function} [predicate=_.identity] The function invoked per iteration.
 	     * @returns {string|undefined} Returns the key of the matched element,
 	     *  else `undefined`.
@@ -15226,7 +16626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Creates an array of the own enumerable property names of `object`.
 	     *
 	     * **Note:** Non-object values are coerced to objects. See the
-	     * [ES spec](http://ecma-international.org/ecma-262/6.0/#sec-object.keys)
+	     * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
 	     * for more details.
 	     *
 	     * @static
@@ -15251,23 +16651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => ['0', '1']
 	     */
 	    function keys(object) {
-	      var isProto = isPrototype(object);
-	      if (!(isProto || isArrayLike(object))) {
-	        return baseKeys(object);
-	      }
-	      var indexes = indexKeys(object),
-	          skipIndexes = !!indexes,
-	          result = indexes || [],
-	          length = result.length;
-
-	      for (var key in object) {
-	        if (baseHas(object, key) &&
-	            !(skipIndexes && (key == 'length' || isIndex(key, length))) &&
-	            !(isProto && key == 'constructor')) {
-	          result.push(key);
-	        }
-	      }
-	      return result;
+	      return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
 	    }
 
 	    /**
@@ -15294,23 +16678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
 	     */
 	    function keysIn(object) {
-	      var index = -1,
-	          isProto = isPrototype(object),
-	          props = baseKeysIn(object),
-	          propsLength = props.length,
-	          indexes = indexKeys(object),
-	          skipIndexes = !!indexes,
-	          result = indexes || [],
-	          length = result.length;
-
-	      while (++index < propsLength) {
-	        var key = props[index];
-	        if (!(skipIndexes && (key == 'length' || isIndex(key, length))) &&
-	            !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
-	          result.push(key);
-	        }
-	      }
-	      return result;
+	      return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
 	    }
 
 	    /**
@@ -16116,8 +17484,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Deburrs `string` by converting
-	     * [latin-1 supplementary letters](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table)
-	     * to basic latin letters and removing
+	     * [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table)
+	     * and [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)
+	     * letters to basic Latin letters and removing
 	     * [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks).
 	     *
 	     * @static
@@ -16133,7 +17502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    function deburr(string) {
 	      string = toString(string);
-	      return string && string.replace(reLatin1, deburrLetter).replace(reComboMark, '');
+	      return string && string.replace(reLatin, deburrLetter).replace(reComboMark, '');
 	    }
 
 	    /**
@@ -16143,7 +17512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 3.0.0
 	     * @category String
-	     * @param {string} [string=''] The string to search.
+	     * @param {string} [string=''] The string to inspect.
 	     * @param {string} [target] The string to search for.
 	     * @param {number} [position=string.length] The position to search up to.
 	     * @returns {boolean} Returns `true` if `string` ends with `target`,
@@ -16499,7 +17868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var args = arguments,
 	          string = toString(args[0]);
 
-	      return args.length < 3 ? string : nativeReplace.call(string, args[1], args[2]);
+	      return args.length < 3 ? string : string.replace(args[1], args[2]);
 	    }
 
 	    /**
@@ -16560,11 +17929,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (separator != null && !isRegExp(separator))
 	          )) {
 	        separator = baseToString(separator);
-	        if (separator == '' && reHasComplexSymbol.test(string)) {
+	        if (!separator && hasUnicode(string)) {
 	          return castSlice(stringToArray(string), 0, limit);
 	        }
 	      }
-	      return nativeSplit.call(string, separator, limit);
+	      return string.split(separator, limit);
 	    }
 
 	    /**
@@ -16599,7 +17968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @memberOf _
 	     * @since 3.0.0
 	     * @category String
-	     * @param {string} [string=''] The string to search.
+	     * @param {string} [string=''] The string to inspect.
 	     * @param {string} [target] The string to search for.
 	     * @param {number} [position=0] The position to search from.
 	     * @returns {boolean} Returns `true` if `string` starts with `target`,
@@ -17036,7 +18405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      string = toString(string);
 
 	      var strLength = string.length;
-	      if (reHasComplexSymbol.test(string)) {
+	      if (hasUnicode(string)) {
 	        var strSymbols = stringToArray(string);
 	        strLength = strSymbols.length;
 	      }
@@ -17173,7 +18542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      pattern = guard ? undefined : pattern;
 
 	      if (pattern === undefined) {
-	        pattern = reHasComplexWord.test(string) ? reComplexWord : reBasicWord;
+	        return hasUnicodeWord(string) ? unicodeWords(string) : asciiWords(string);
 	      }
 	      return string.match(pattern) || [];
 	    }
@@ -17490,8 +18859,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * object and `source`, returning `true` if the given object has equivalent
 	     * property values, else `false`.
 	     *
-	     * **Note:** The created function supports comparing the same values as
-	     * `_.isEqual` is equivalent to `_.isMatch` with `source` partially applied.
+	     * **Note:** The created function is equivalent to `_.isMatch` with `source`
+	     * partially applied.
+	     *
+	     * Partial comparisons will match empty array and empty object `source`
+	     * values against any array or object value, respectively. See `_.isEqual`
+	     * for a list of supported value comparisons.
 	     *
 	     * @static
 	     * @memberOf _
@@ -17518,7 +18891,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * value at `path` of a given object to `srcValue`, returning `true` if the
 	     * object value is equivalent, else `false`.
 	     *
-	     * **Note:** This method supports comparing the same values as `_.isEqual`.
+	     * **Note:** Partial comparisons will match empty array and empty object
+	     * `srcValue` values against any array or object value, respectively. See
+	     * `_.isEqual` for a list of supported value comparisons.
 	     *
 	     * @static
 	     * @memberOf _
@@ -19061,10 +20436,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -19074,9 +20449,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _lodash = __webpack_require__(17);
+	var _lodash = __webpack_require__(18);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _validate = __webpack_require__(9);
+
+	var _validate2 = _interopRequireDefault(_validate);
+
+	var _validations = __webpack_require__(20);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19088,6 +20469,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _classCallCheck(this, LineItem);
 
+	    var result = (0, _validate2.default)(product, _validations.productValidations);
+	    if (result) throw result;
+
 	    this.product = product;
 	    this.quantity = quantity;
 	    this.configuration = [];
@@ -19096,13 +20480,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(LineItem, [{
-	    key: "configurationForGroup",
+	    key: 'configurationForGroup',
 	    value: function configurationForGroup(groupOrId) {
-	      var optionGroupId = (typeof groupOrId === "undefined" ? "undefined" : _typeof(groupOrId)) === "object" ? groupOrId.id : parseInt(groupOrId);
+	      var optionGroupId = (typeof groupOrId === 'undefined' ? 'undefined' : _typeof(groupOrId)) === "object" ? groupOrId.id : parseInt(groupOrId);
 	      return _lodash2.default.find(this.configuration, { optionGroupId: optionGroupId });
 	    }
 	  }, {
-	    key: "addOption",
+	    key: 'addOption',
 	    value: function addOption(group, item) {
 	      var groupConfig = this.configurationForGroup(group);
 	      var canAdd = group.max_options > (groupConfig ? groupConfigoptionItems.length : 0);
@@ -19128,7 +20512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return true;
 	    }
 	  }, {
-	    key: "removeOption",
+	    key: 'removeOption',
 	    value: function removeOption(item) {
 	      var groupConfig = this.configurationForGroup(item.group_id);
 	      if (groupConfig) {
@@ -19139,22 +20523,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return groupConfig;
 	    }
 	  }, {
-	    key: "isValid",
+	    key: 'isValid',
 	    value: function isValid() {
 	      return this.errors().length === 0;
 	    }
 	  }, {
-	    key: "hasOptionGroups",
+	    key: 'hasOptionGroups',
 	    value: function hasOptionGroups() {
 	      return this.optionGroups().length > 0;
 	    }
 	  }, {
-	    key: "optionGroups",
+	    key: 'optionGroups',
 	    value: function optionGroups() {
 	      return this.product.option_groups || [];
 	    }
 	  }, {
-	    key: "errors",
+	    key: 'errors',
 	    value: function errors() {
 	      var _this = this;
 
@@ -19181,27 +20565,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }).compact().value();
 	    }
 	  }, {
-	    key: "format",
+	    key: 'format',
 	    value: function format() {
 	      return {
 	        id: this.product.id,
 	        made_for: this.madeFor,
 	        instructions: this.instructions,
 	        quantity: this.quantity,
-	        // below doesnt make sense
-	        price: this.product.price,
-	        category_id: this.product.category_id,
-	        name: this.product.name,
 	        option_groups: _lodash2.default.map(this.configuration, function (g) {
 	          return {
 	            id: g.optionGroupId,
 	            option_items: _lodash2.default.map(g.optionItems, function (oi) {
-	              return {
-	                id: oi.id,
-	                // This shoulndt b passed
-	                name: oi.name,
-	                price: oi.price
-	              };
+	              return { id: oi.id };
 	            })
 	          };
 	        })
@@ -19213,6 +20588,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = LineItem;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var cardValidations = exports.cardValidations = {
+	  cc_number: {
+	    presence: true,
+	    length: { minimum: 15, maximum: 16 }
+	  },
+	  cc_cvv: {
+	    presence: true,
+	    length: { minimum: 3, maximum: 4 }
+	  },
+	  cc_zip: {
+	    presence: true,
+	    numericality: true,
+	    length: { is: 5 }
+	  },
+	  cc_expiration: {
+	    presence: true,
+	    length: { is: 4 }
+	  }
+	};
+
+	var customerValidations = exports.customerValidations = {
+	  email: {
+	    presence: true,
+	    email: true
+	  },
+	  password: {
+	    presence: true,
+	    length: { minimum: 6 }
+	  },
+	  first_name: {
+	    presence: true
+	  },
+	  last_name: {
+	    presence: true
+	  }
+	};
+
+	var productValidations = exports.productValidations = {
+	  id: {
+	    presence: true,
+	    numericality: true
+	  },
+	  option_groups: {
+	    presence: true
+	  }
+	};
 
 /***/ }
 /******/ ])
