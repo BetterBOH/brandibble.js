@@ -79,14 +79,17 @@ describe('Customers', () => {
     });
   });
 
-  /* TODO: This should not require a customer-token, waiting on JC
   it('can validate a customers metadata', done => {
     Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example.com' }).then(response => {
-      debugger;
+      let data = shouldSucceed(response);
+      expect(data).to.have.property('is_brandibble_active');
+      expect(data).to.have.property('is_brandibble_customer');
+      expect(data).to.have.property('is_levelup_connected');
+      expect(data).to.have.property('is_levelup_user');
+      expect(data).to.have.property('levelup_connected_email');
       done();
     });
   });
-  */
 
   it('can trigger a customers reset password flow', done => {
     Brandibble.customers.resetPassword({ email: "sanctuary-testing-customer@example.com" }).then(response => {
