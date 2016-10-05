@@ -91,6 +91,15 @@ describe('Customers', () => {
     });
   });
 
+  it('cannot validate a customers metadata when email is invalid', done => {
+    Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example' }).catch(response => {
+      let errors = shouldError(response);
+      expect(errors).to.be.a('array').to.have.lengthOf(1);
+      expect(errors[0]).to.have.property('code', 'customers.validate.invalid_email');
+      done();
+    });
+  });
+
   it('can trigger a customers reset password flow', done => {
     Brandibble.customers.resetPassword({ email: "sanctuary-testing-customer@example.com" }).then(response => {
       expect(response).to.be.true;
