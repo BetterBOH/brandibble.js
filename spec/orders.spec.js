@@ -1,7 +1,10 @@
 import { shouldSucceed, shouldError, TestingUser, configureTestingOrder } from './helpers';
 
 describe('Orders', () => {
-  it('exists', () => { expect(Brandibble.orders).to.exist });
+  it('exists', done => {
+    expect(Brandibble.orders).to.exist;
+    done();
+  });
 
   it('can validate an order', done => {
     configureTestingOrder(Brandibble).then(newOrder => {
