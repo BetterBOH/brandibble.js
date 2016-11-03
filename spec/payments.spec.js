@@ -1,12 +1,12 @@
 import { retrieve } from '../lib/utils';
 import { seedEmail, seedText, shouldSucceed, shouldError, TestingUser } from './helpers';
 
-describe('Addresses', () => {
+describe('Payments', () => {
   beforeEach(done => {
     Brandibble.customers.invalidate().then(done);
   });
 
-  it('exists', () => expect(Brandibble.addresses).to.exist);
+  it('exists', () => expect(Brandibble.payments).to.exist);
 
   it('can show all payment methods for a customer', done => {
     const { email, password } = TestingUser;
