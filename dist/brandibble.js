@@ -23700,6 +23700,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function all() {
 	      return this.adapter.request('GET', 'customers/' + this.adapter.customerId() + '/cards');
 	    }
+	  }, {
+	    key: 'create',
+	    value: function create(body) {
+	      return this.adapter.request('POST', 'customers/' + this.adapter.customerId() + '/cards', body);
+	    }
 	  }]);
 
 	  return Payments;
