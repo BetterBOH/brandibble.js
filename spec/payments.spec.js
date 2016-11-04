@@ -67,4 +67,25 @@ describe('Payments', () => {
     });
   });
 
+  it('will fail when if the card number does not have 15 or 16 numbers', done => {
+    const { email, password } = TestingUser;
+    Brandibble.customers.authenticate({
+      email,
+      password
+    }).then(response => {
+      let data = shouldSucceed(response);
+      Brandibble.payments.create({ 
+        'cc_number': 478, 
+        'cc_expiration': 1018, 
+        'cc_cvv': 740,
+        'cc_zip': 10022 
+      }).catch(response => {
+        let errors = shouldError(response);
+        expect(errors).to.be.a('array').to.have.lengthOf(2);
+        expect(errors[0]).to.have.property('code', 'customers.cards.add.invalid_card');
+        done();
+      });
+    });
+  });
+
 });
