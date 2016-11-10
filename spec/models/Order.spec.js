@@ -2,6 +2,15 @@ import productJSON from './../product.stub';
 import locationJSON from './../location.stub';
 import { TestingAddress } from '../helpers';
 
+const defaultOptions = {
+  include_utensils: true,
+  notes_for_store: "",
+  tip: 0
+};
+
+const validTimestamp = `${(new Date()).toISOString().split('.')[0]}Z`;
+const invalidTimestamp = new Date();
+
 describe('Order', () => {
   it('can add a LineItem', () => {
     let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
@@ -47,6 +56,26 @@ describe('Order', () => {
       expect(savedOrder.customer.customer_id).to.exist;
       done();
     });
+  });
+
+  it('returns true for valid request at timestamp', done => {
+    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    let requestedAtTime = `${(new Date()).toISOString().split('.')[0]}Z`;
+
+    newOrder.setRequestedAt(requestedAtTime).then(order => {
+      expect(newOrder.requestedAt).to.equal(requestedAtTime);
+      done();
+    });
+  });
+
+  it('returns errors for invalid request at timestamp', done => {
+    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    let requestedAtTime = new Date();
+
+    newOrder.setRequestedAt(requestedAtTime).catch(errors => {
+      expect(errors).to.have.keys(['timestamp']);
+      done();
+    })
   });
 
   it('returns errors for invalid customers', done => {

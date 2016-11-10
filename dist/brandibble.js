@@ -535,6 +535,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _orders2 = _interopRequireDefault(_orders);
 
+	var _payments = __webpack_require__(22);
+
+	var _payments2 = _interopRequireDefault(_payments);
+
+	var _allergens = __webpack_require__(23);
+
+	var _allergens2 = _interopRequireDefault(_allergens);
+
 	var _order = __webpack_require__(12);
 
 	var _order2 = _interopRequireDefault(_order);
@@ -583,6 +591,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addresses = new _addresses2.default(this.adapter);
 	    this.menus = new _menus2.default(this.adapter);
 	    this.orders = new _orders2.default(this.adapter);
+	    this.payments = new _payments2.default(this.adapter);
+	    this.allergens = new _allergens2.default(this.adapter);
 
 	    /* Misc */
 	    this.TestCreditCards = _utils.TestCreditCards;
@@ -663,6 +673,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = "" + value;
 	    }
 	    return length.call(this, value, options, key, attributes);
+	  };
+
+	  // Is Array for Validate.js
+	  _validate2.default.validators.isArray = function (value) {
+	    if (_validate2.default.isArray(value)) {
+	      return;
+	    }
+	    return "must be an array";
 	  };
 
 	  if (typeof Promise === 'undefined') {
@@ -3142,6 +3160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var locationId = serializedOrder.locationId;
 	        var serviceType = serializedOrder.serviceType;
 	        var miscOptions = serializedOrder.miscOptions;
+	        var requestedAt = serializedOrder.requestedAt;
 	        var cart = serializedOrder.cart;
 	        var customer = serializedOrder.customer;
 	        var address = serializedOrder.address;
@@ -3152,6 +3171,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (customer) {
 	          order.customer = customer;
+	        }
+	        if (requestedAt) {
+	          order.requestedAt = requestedAt;
 	        }
 	        _this.currentOrder = order.rehydrateCart(cart);
 	        return _this.currentOrder;
@@ -5557,6 +5579,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tip: 0
 	};
 
+	var ASAP_STRING = 'asap';
+	var ISO8601_PATTERN = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+
 	var Order = function () {
 	  function Order(adapter, location_id) {
 	    var serviceType = arguments.length <= 2 || arguments[2] === undefined ? 'delivery' : arguments[2];
@@ -5569,6 +5594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.locationId = location_id;
 	    this.serviceType = serviceType;
 	    this.miscOptions = miscOptions;
+	    this.requestedAt = ASAP_STRING;
 	  }
 
 	  _createClass(Order, [{
@@ -5593,6 +5619,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        lineItem.configuration = configuration;
 	      });
 	      return this;
+	    }
+	  }, {
+	    key: 'setRequestedAt',
+	    value: function setRequestedAt() {
+	      var timestampOrAsap = arguments.length <= 0 || arguments[0] === undefined ? ASAP_STRING : arguments[0];
+
+	      if (timestampOrAsap === ASAP_STRING) {
+	        this.requestedAt = ASAP_STRING;
+	        return this.adapter.persistCurrentOrder(this);
+	      } else {
+	        var result = (0, _validate2.default)({ timestamp: timestampOrAsap }, { timestamp: { format: ISO8601_PATTERN } });
+	        if (!result) {
+	          this.requestedAt = timestampOrAsap;
+	          return this.adapter.persistCurrentOrder(this);
+	        }
+	        return Promise.reject(result);
+	      }
 	    }
 	  }, {
 	    key: 'setCustomer',
@@ -5694,6 +5737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return {
 	        location_id: this.locationId,
 	        service_type: this.serviceType,
+	        requested_at: this.requestedAt,
 	        cart: this.cart.format()
 	      };
 	    }
@@ -5772,6 +5816,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        customer: this.formatCustomer(),
 	        location_id: this.locationId,
 	        service_type: this.serviceType,
+	        requested_at: this.requestedAt,
 	        cart: this.cart.format(),
 	        include_utensils: include_utensils,
 	        notes_for_store: notes_for_store,
@@ -22884,7 +22929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    numericality: true
 	  },
 	  option_groups: {
-	    presence: true
+	    isArray: true
 	  }
 	};
 
@@ -23014,7 +23059,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _createClass(Locations, [{
 	    key: 'index',
-	    value: function index() {
+	    value: function index(lat, lng) {
+	      if (lat && lng) {
+	        return this.adapter.request('GET', 'locations?latitude=' + lat + '&longitude=' + lng);
+	      }
 	      return this.adapter.request('GET', 'locations');
 	    }
 	  }]);
@@ -23141,17 +23189,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'validate',
 	    value: function validate(orderObj) {
-	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
 	      var body = orderObj.formatForValidation();
-	      body.requested_at = requested_at;
 	      return this.adapter.request('POST', 'orders/validate', body);
 	    }
 	  }, {
 	    key: 'submit',
 	    value: function submit(orderObj, paymentType, card) {
-	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
 	      var body = orderObj.format(paymentType, card);
-	      body.requested_at = requested_at;
 	      return this.adapter.request('POST', 'orders/create', body);
 	    }
 	  }]);
@@ -23160,6 +23204,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = Orders;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Payments = function () {
+	  function Payments(adapter) {
+	    _classCallCheck(this, Payments);
+
+	    this.adapter = adapter;
+	  }
+
+	  _createClass(Payments, [{
+	    key: 'all',
+	    value: function all() {
+	      return this.adapter.request('GET', 'customers/' + this.adapter.customerId() + '/cards');
+	    }
+	  }, {
+	    key: 'create',
+	    value: function create(body) {
+	      return this.adapter.request('POST', 'customers/' + this.adapter.customerId() + '/cards', body);
+	    }
+	  }]);
+
+	  return Payments;
+	}();
+
+	exports.default = Payments;
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Allergens = function () {
+	  function Allergens(adapter) {
+	    _classCallCheck(this, Allergens);
+
+	    this.adapter = adapter;
+	  }
+
+	  _createClass(Allergens, [{
+	    key: 'all',
+	    value: function all() {
+	      return this.adapter.request('GET', 'allergens');
+	    }
+	  }]);
+
+	  return Allergens;
+	}();
+
+	exports.default = Allergens;
 
 /***/ }
 /******/ ])

@@ -19,6 +19,11 @@ describe('LineItem', () => {
     expect(lineItem.errors()).to.have.lengthOf(0);
   });
 
+  it('allows products with an empty option_groups array', () => {
+    let lineItem = new Brandibble.LineItem({id: 1, option_groups: []}, 1);
+    expect(lineItem.isValid()).to.equal(true);
+  });
+
   it('can format itself', () => {
     let lineItem = new Brandibble.LineItem(productJSON, 1);
     let bases = lineItem.optionGroups()[0];

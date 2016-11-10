@@ -32,4 +32,16 @@ describe('Adapter', () => {
       });
     }).catch(error => console.log(error));
   })
+
+  it('can restore requestedAt from localStorage', done => {
+    configureTestingOrder(Brandibble).then(order => {
+      let requestedAtTime = `${(new Date()).toISOString().split('.')[0]}Z`;
+      order.setRequestedAt(requestedAtTime).then(() => {
+        Brandibble.adapter.restoreCurrentOrder().then(retrievedOrder => {
+          expect(retrievedOrder.requestedAt).to.equal(requestedAtTime);
+          done();
+        });
+      });
+    }).catch(error => console.log(error));
+  })
 });
