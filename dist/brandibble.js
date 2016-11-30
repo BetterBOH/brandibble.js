@@ -23135,8 +23135,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'build',
 	    value: function build(location_id) {
 	      var service_type = arguments.length <= 1 || arguments[1] === undefined ? 'delivery' : arguments[1];
+	      var date = arguments.length <= 2 || arguments[2] === undefined ? new Date() : arguments[2];
 
-	      var requested_at = new Date().toISOString().split('.')[0] + 'Z';
+	      var requested_at = date.toISOString().split('.')[0] + 'Z';
 	      return this.adapter.request('POST', 'menus', { location_id: location_id, service_type: service_type, requested_at: requested_at });
 	    }
 	  }]);
