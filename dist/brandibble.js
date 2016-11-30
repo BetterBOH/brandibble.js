@@ -23184,6 +23184,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function current() {
 	      return this.adapter.currentOrder;
 	    }
+
+	    /* The only attrs testChanges accepts are location_id, service_type & requested_at */
+
 	  }, {
 	    key: 'validate',
 	    value: function validate(orderObj) {

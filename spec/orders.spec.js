@@ -25,7 +25,8 @@ describe('Orders', () => {
         return configureTestingOrder(Brandibble, customer, address)
           .then(testingOrder => Brandibble.orders.submit(testingOrder, "credit", card))
           .then(response => {
-            expect(response).to.be.true
+            let data = shouldSucceed(response);
+            expect(data).to.be.a('object');
             done();
           });
       });

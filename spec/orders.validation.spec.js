@@ -22,7 +22,7 @@ describe('Orders Validate', () => {
       Brandibble.orders.validate(newOrder, { location_id: 19 }).catch(response => {
         let errors = shouldError(response);
         expect(errors).to.be.a('array');
-        expect(errors[0].code).to.be("orders.validate.invalid_items");
+        expect(errors[0].code).to.equal("orders.validate.invalid_items");
         done();
       });
     });
