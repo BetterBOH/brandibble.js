@@ -6,16 +6,6 @@ describe('Orders', () => {
     done();
   });
 
-  it('can validate an order', done => {
-    configureTestingOrder(Brandibble).then(newOrder => {
-      Brandibble.orders.validate(newOrder).then(response => {
-        let data = shouldSucceed(response);
-        expect(data).to.be.a('object');
-        done();
-      });
-    });
-  });
-
   it('an authenticated client can submit an order', done => {
     const { email, password } = TestingUser;
     Brandibble.customers.authenticate({

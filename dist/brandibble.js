@@ -23187,7 +23187,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'validate',
 	    value: function validate(orderObj) {
+	      var testChanges = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
 	      var body = orderObj.formatForValidation();
+	      Object.assign(body, testChanges);
 	      return this.adapter.request('POST', 'orders/validate', body);
 	    }
 	  }, {
