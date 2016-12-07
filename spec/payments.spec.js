@@ -123,4 +123,39 @@ describe('Payments', () => {
     });
   });
 
+  it('can delete an existing card', done => {
+    const { email, password } = TestingUser;
+    Brandibble.customers.authenticate({
+      email,
+      password
+    }).then(response => {
+      let data = shouldSucceed(response);
+      Brandibble.payments.all().then(response => {
+        let cardToDelete = response.data[0];
+        let { customer_card_id } = cardToDelete;
+        Brandibble.payments.delete(customer_card_id).then(response => {
+          expect(response).to.be.true;
+          done();
+        });
+      });
+    });
+  });
+
+  it('will fail when an invalid card id is passed to delete', done => {
+    const { email, password } = TestingUser;
+    Brandibble.customers.authenticate({
+      email,
+      password
+    }).then(response => {
+      let data = shouldSucceed(response);
+      let badId = 'hfg7d8fh';
+      Brandibble.payments.delete(badId).catch(response => {
+        let errors = shouldError(response);
+        expect(errors).to.be.a('array').to.have.lengthOf(2);
+        expect(errors[0]).to.have.property('code', 'customers.cards.delete.invalid_id');
+        done();
+      });
+    });
+  });
+
 });

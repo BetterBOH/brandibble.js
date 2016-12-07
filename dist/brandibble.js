@@ -23830,6 +23830,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function setDefault(customerCardId) {
 	      return this.adapter.request('PUT', 'customers/' + this.adapter.customerId() + '/cards/' + customerCardId);
 	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete(customerCardId) {
+	      return this.adapter.request('DELETE', 'customers/' + this.adapter.customerId() + '/cards/' + customerCardId);
+	    }
 	  }]);
 
 	  return Payments;
