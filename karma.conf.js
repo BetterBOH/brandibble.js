@@ -4,11 +4,12 @@ webpackConfig.devtool = 'inline-source-map';
 
 module.exports = function (config) {
   config.set({
-    browsers: ['Chrome'],
+    browsers: ['Chrome', 'Safari'],
     singleRun: !!process.env.CI,
     frameworks: ['mocha', 'chai'],
     files: ['spec/**/*.spec.js'],
     plugins: [
+      'karma-safari-launcher',
       'karma-chrome-launcher',
       'karma-chai',
       'karma-mocha',
