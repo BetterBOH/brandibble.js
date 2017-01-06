@@ -28,8 +28,8 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
-    "es6-promise": "^3.2.1",
-    "localforage": "^1.4.2",
+    "es6-promise": "^4.0.5",
+    "localforage": "^1.4.3",
     "lodash": "^4.14.1",
     "validate.js": "^0.10.0",
     "whatwg-fetch": "^1.0.0"
