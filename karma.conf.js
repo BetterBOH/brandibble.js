@@ -4,7 +4,7 @@ webpackConfig.devtool = 'inline-source-map';
 
 module.exports = function (config) {
   config.set({
-    browsers: ['Chrome', 'Safari'],
+    browsers: process.env.CI ? ['Chrome'] : ['Chrome', 'Safari'],
     singleRun: !!process.env.CI,
     frameworks: ['mocha', 'chai'],
     files: ['spec/**/*.spec.js'],
