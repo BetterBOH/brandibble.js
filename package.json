@@ -29,6 +29,7 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
+    "circular-json": "^0.3.1",
     "es6-promise": "^4.0.5",
     "localforage": "^1.4.3",
     "lodash": "^4.14.1",
