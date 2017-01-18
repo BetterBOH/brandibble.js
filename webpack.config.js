@@ -11,6 +11,9 @@ module.exports = {
     filename: "brandibble.js",
     libraryTarget: 'umd'
   },
+  externals: {
+    'react-native': 'react-native'
+  },
   resolve: {
     root: path.resolve(__dirname),
     extensions: ['', '.js', '.json'],
