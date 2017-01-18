@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
+		module.exports = factory(require("react-native"));
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define(["react-native"], factory);
 	else {
-		var a = factory();
+		var a = typeof exports === 'object' ? factory(require("react-native")) : factory(root["react-native"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function() {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_18__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -515,31 +515,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _adapter2 = _interopRequireDefault(_adapter);
 
-	var _customers = __webpack_require__(18);
+	var _customers = __webpack_require__(19);
 
 	var _customers2 = _interopRequireDefault(_customers);
 
-	var _locations = __webpack_require__(22);
+	var _locations = __webpack_require__(23);
 
 	var _locations2 = _interopRequireDefault(_locations);
 
-	var _addresses = __webpack_require__(23);
+	var _addresses = __webpack_require__(24);
 
 	var _addresses2 = _interopRequireDefault(_addresses);
 
-	var _menus = __webpack_require__(24);
+	var _menus = __webpack_require__(25);
 
 	var _menus2 = _interopRequireDefault(_menus);
 
-	var _orders = __webpack_require__(25);
+	var _orders = __webpack_require__(26);
 
 	var _orders2 = _interopRequireDefault(_orders);
 
-	var _payments = __webpack_require__(26);
+	var _payments = __webpack_require__(27);
 
 	var _payments2 = _interopRequireDefault(_payments);
 
-	var _allergens = __webpack_require__(27);
+	var _allergens = __webpack_require__(28);
 
 	var _allergens2 = _interopRequireDefault(_allergens);
 
@@ -3293,9 +3293,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _circularJson2 = _interopRequireDefault(_circularJson);
 
+	var _reactNative = __webpack_require__(18);
+
+	var _reactNative2 = _interopRequireDefault(_reactNative);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var STORAGE = void 0;
+	if (_reactNative2.default) {
+	  STORAGE = _reactNative2.default.AsyncStorage;
+	} else {
+	  _localforage2.default.config({
+	    storeName: 'brandibble'
+	  });
+	  STORAGE = _localforage2.default;
+	}
 
 	var FiveHundredError = {
 	  errors: [{
@@ -3337,10 +3351,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	_localforage2.default.config({
-	  storeName: 'brandibble'
-	});
-
 	var Adapter = function () {
 	  function Adapter(_ref) {
 	    var apiKey = _ref.apiKey;
@@ -3364,14 +3374,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'flushAll',
 	    value: function flushAll() {
-	      return _localforage2.default.clear();
+	      return STORAGE.clear();
 	    }
 	  }, {
 	    key: 'restoreCurrentOrder',
 	    value: function restoreCurrentOrder() {
 	      var _this = this;
 
-	      return _localforage2.default.getItem('currentOrder').then(function (serializedOrder) {
+	      return STORAGE.getItem('currentOrder').then(function (serializedOrder) {
 	        if (!serializedOrder) return;
 
 	        var _CircularJSON$parse = _circularJson2.default.parse(serializedOrder);
@@ -3411,13 +3421,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'persistCurrentOrder',
 	    value: function persistCurrentOrder(order) {
 	      this.currentOrder = order;
-	      /* Ensure raw Credit Card data isn't persisted to localStorage */
+	      /* Ensure raw Credit Card data isn't persisted to STORAGE */
 	      if (order.creditCard) {
 	        var _ret = function () {
 	          var creditCardData = Object.assign({}, order.creditCard);
 
 	          return {
-	            v: _localforage2.default.setItem('currentOrder', _circularJson2.default.stringify(sanitizeCreditCard(order))).then(function () {
+	            v: STORAGE.setItem('currentOrder', _circularJson2.default.stringify(sanitizeCreditCard(order))).then(function () {
 	              order.creditCard = creditCardData;
 	              return order;
 	            })
@@ -3426,21 +3436,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	      }
-	      return _localforage2.default.setItem('currentOrder', _circularJson2.default.stringify(order)).then(function () {
+	      return STORAGE.setItem('currentOrder', _circularJson2.default.stringify(order)).then(function () {
 	        return order;
 	      });
 	    }
 	  }, {
 	    key: 'flushCurrentOrder',
 	    value: function flushCurrentOrder() {
-	      return _localforage2.default.removeItem('currentOrder');
+	      return STORAGE.removeItem('currentOrder');
 	    }
 	  }, {
 	    key: 'restoreCustomerToken',
 	    value: function restoreCustomerToken() {
 	      var _this2 = this;
 
-	      return _localforage2.default.getItem('customerToken').then(function (customerToken) {
+	      return STORAGE.getItem('customerToken').then(function (customerToken) {
 	        _this2.customerToken = customerToken;
 	      });
 	    }
@@ -3449,7 +3459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function persistCustomerToken(customerToken) {
 	      var _this3 = this;
 
-	      return _localforage2.default.setItem('customerToken', customerToken).then(function (token) {
+	      return STORAGE.setItem('customerToken', customerToken).then(function (token) {
 	        _this3.customerToken = token;
 	      });
 	    }
@@ -23448,6 +23458,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 18 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_18__;
+
+/***/ },
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23458,7 +23474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _querystring = __webpack_require__(19);
+	var _querystring = __webpack_require__(20);
 
 	var _querystring2 = _interopRequireDefault(_querystring);
 
@@ -23567,17 +23583,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Customers;
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.decode = exports.parse = __webpack_require__(20);
-	exports.encode = exports.stringify = __webpack_require__(21);
+	exports.decode = exports.parse = __webpack_require__(21);
+	exports.encode = exports.stringify = __webpack_require__(22);
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -23663,7 +23679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -23733,7 +23749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23769,7 +23785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Locations;
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23807,7 +23823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Addresses;
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23844,7 +23860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Menus;
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23907,7 +23923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Orders;
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23955,7 +23971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Payments;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	'use strict';
