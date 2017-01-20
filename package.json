@@ -5,7 +5,7 @@
   "repository": "https://github.com/sanctuarycomputer/brandibble.js",
   "main": "dist/brandibble.js",
   "scripts": {
-    "build": "weback",
+    "build": "webpack",
     "test": "webpack; karma start"
   },
   "author": "Hugh Francis <me@hughfrancis.me> (http://hughfrancis.me/)",
