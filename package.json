@@ -5,7 +5,7 @@
   "repository": "https://github.com/sanctuarycomputer/brandibble.js",
   "main": "dist/brandibble.js",
   "scripts": {
-    "build": "webpack",
+    "build": "weback",
     "test": "webpack; karma start"
   },
   "author": "Hugh Francis <me@hughfrancis.me> (http://hughfrancis.me/)",
@@ -23,7 +23,6 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
-    "localforage": "^1.4.3",
     "mocha": "^2.5.3",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.10",
@@ -32,6 +31,7 @@
   "dependencies": {
     "circular-json": "^0.3.1",
     "es6-promise": "^4.0.5",
+    "localforage": "^1.4.3",
     "lodash": "^4.14.1",
     "validate.js": "^0.10.0",
     "whatwg-fetch": "^1.0.0"
