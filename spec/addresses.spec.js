@@ -30,14 +30,25 @@ describe('Addresses', () => {
       password
     }).then(response => {
       let data = shouldSucceed(response);
-      Brandibble.addresses.all().then(response => {
+      Brandibble.addresses.create({
+        street_address: '69 Street St',
+        unit: '1 FL',
+        city: 'New York',
+        state_code: 'NY',
+        zip_code: 10013,
+        latitude: 40.755912,
+        longitude: -73.9709333,
+        company: 'Hello Computer',
+        contact_name: 'Steve Francis',
+        contact_phone: '5512213610'
+      }).then(response => {
         let addressToDelete = response.data[0];
         let { customer_address_id } = addressToDelete;
         Brandibble.addresses.delete(customer_address_id).then(response => {
           expect(response).to.be.true;
           done();
-        });
-      });
+        })
+      })
     });
   });
 
@@ -91,5 +102,4 @@ describe('Addresses', () => {
       });
     });
   });
-
 });
