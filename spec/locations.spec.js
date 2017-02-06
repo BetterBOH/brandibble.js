@@ -11,6 +11,28 @@ describe('Locations', () => {
     });
   });
 
+  it('can show a specific location', done => {
+    const locationId = 19;
+    Brandibble.locations.show(locationId).then(response => {
+      let data = shouldSucceed(response);
+      expect(data).to.be.an('object');
+      done();
+    });
+  });
+
+  it('can show a specific location if passed lat and lng', done => {
+    const locationId = 19;
+    const lat = 0.755912;
+    const lng = -73.9709333;
+
+    Brandibble.locations.show(locationId, lat, lng).then(response => {
+      let data = shouldSucceed(response);
+      expect(data).to.be.an('object');
+      done();
+    });
+  });
+
+
   it('can show all locations if passed valid lat and lng', done => {
     const lat = 0.755912;
     const lng = -73.9709333;
@@ -18,6 +40,15 @@ describe('Locations', () => {
     Brandibble.locations.index(lat, lng).then(response => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
+      done();
+    });
+  });
+
+  it('returns errors if passed invalid locationId', done => {
+    const locationId = '6hg';
+
+    Brandibble.locations.show(locationId).catch(errors => {
+      expect(errors).to.be.an('object');
       done();
     });
   });

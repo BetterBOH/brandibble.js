@@ -3614,7 +3614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Order = function () {
 	  function Order(adapter, location_id) {
-	    var serviceType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'pickup';
+	    var serviceType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'delivery';
 	    var paymentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _utils.PaymentTypes.CASH;
 	    var miscOptions = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : defaultOptions;
 
@@ -21892,11 +21892,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'show',
-	    value: function show(location_id, lat, lng) {
+	    value: function show(locationId, lat, lng) {
 	      if (lat && lng) {
-	        return this.adapter.request('GET', 'locations/' + location_id + '?latitude=' + lat + '&longitude=' + lng);
+	        return this.adapter.request('GET', 'locations/' + locationId + '?latitude=' + lat + '&longitude=' + lng);
 	      }
-	      return this.adapter.request('GET', 'locations/' + location_id);
+	      return this.adapter.request('GET', 'locations/' + locationId);
 	    }
 	  }]);
 
@@ -21980,7 +21980,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Menus, [{
 	    key: 'build',
 	    value: function build(location_id) {
-	      var service_type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'pickup';
+	      var service_type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'delivery';
 	      var date = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : new Date();
 
 	      var isISOString = (0, _validate2.default)({ timestamp: date }, { timestamp: { format: _utils.ISO8601_PATTERN } });
