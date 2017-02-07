@@ -34,17 +34,34 @@ describe('Locations', () => {
 
 
   it('can show all locations if passed valid lat and lng', done => {
-    const lat = 0.755912;
-    const lng = -73.9709333;
+    const latLng = {
+      latitude: 0.755912,
+      longitude: -73.9709333
+    }
 
-    Brandibble.locations.index(lat, lng).then(response => {
+    Brandibble.locations.index(latLng).then(response => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
       done();
     });
   });
 
-  it('returns errors if passed invalid locationId', done => {
+  it('can show all locations that are "in zone" if passed a boolean value', done => {
+    const latLngInZone = {
+      latitude: 0.755912,
+      longitude: -73.9709333,
+      in_zone: true
+    }
+
+    Brandibble.locations.index(latLngInZone).then(response => {
+      let data = shouldSucceed(response);
+      expect(data).to.be.a('array');
+      done();
+    });
+  });
+
+
+  it('returns errors if passed invalid param', done => {
     const locationId = '6hg';
 
     Brandibble.locations.show(locationId).catch(errors => {

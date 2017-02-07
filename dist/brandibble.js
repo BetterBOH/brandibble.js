@@ -696,6 +696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.ISO8601_PATTERN = exports.PaymentTypes = exports.TestCreditCards = undefined;
+	exports.queryStringBuilder = queryStringBuilder;
 	exports.applyPollyfills = applyPollyfills;
 	exports.persist = persist;
 	exports.retrieve = retrieve;
@@ -710,6 +711,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _validate2 = _interopRequireDefault(_validate);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function queryStringBuilder() {
+	  var queryObject = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	  return Object.keys(queryObject).map(function (k) {
+	    return encodeURIComponent(k) + '=' + encodeURIComponent(queryObject[k]);
+	  }).join('&');
+	}
 
 	function localStoragePresent() {
 	  var test = 'test';
@@ -21863,7 +21872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 21 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -21872,6 +21881,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _utils = __webpack_require__(3);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21884,9 +21895,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _createClass(Locations, [{
 	    key: 'index',
-	    value: function index(lat, lng) {
-	      if (lat && lng) {
-	        return this.adapter.request('GET', 'locations?latitude=' + lat + '&longitude=' + lng);
+	    value: function index(queryParamObject) {
+	      if (queryParamObject) {
+	        return this.adapter.request('GET', 'locations?' + (0, _utils.queryStringBuilder)(queryParamObject));
 	      }
 	      return this.adapter.request('GET', 'locations');
 	    }
