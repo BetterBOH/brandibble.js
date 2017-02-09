@@ -598,6 +598,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var brandId = _ref.brandId;
 	    var apiEndpoint = _ref.apiEndpoint;
 	    var apiVersion = _ref.apiVersion;
+	    var _ref$origin = _ref.origin;
+	    var origin = _ref$origin === undefined ? null : _ref$origin;
 	    var storage = _ref.storage;
 
 	    _classCallCheck(this, Brandibble);
@@ -616,7 +618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var apiBase = '' + apiEndpoint + apiVersion + '/brands/' + brandId + '/';
 
 	    /* Build adapter */
-	    this.adapter = new _adapter2.default({ apiKey: apiKey, apiBase: apiBase, storage: storage });
+	    this.adapter = new _adapter2.default({ apiKey: apiKey, apiBase: apiBase, origin: origin, storage: storage });
 
 	    /* Build Resources */
 	    this.Order = _order2.default;
@@ -662,7 +664,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.PaymentTypes = exports.TestCreditCards = undefined;
+	exports.ISO8601_PATTERN = exports.PaymentTypes = exports.TestCreditCards = undefined;
+	exports.queryStringBuilder = queryStringBuilder;
 	exports.applyPollyfills = applyPollyfills;
 	exports.persist = persist;
 	exports.retrieve = retrieve;
@@ -677,6 +680,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _validate2 = _interopRequireDefault(_validate);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function queryStringBuilder() {
+	  var queryObject = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	  return Object.keys(queryObject).map(function (k) {
+	    return encodeURIComponent(k) + '=' + encodeURIComponent(queryObject[k]);
+	  }).join('&');
+	}
 
 	function localStoragePresent() {
 	  var test = 'test';
@@ -784,6 +795,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CASH: 'cash',
 	  CREDIT: 'credit'
 	};
+
+	var ISO8601_PATTERN = exports.ISO8601_PATTERN = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
 
 	// http://stackoverflow.com/posts/8809472/revisions
 	function generateUUID() {
@@ -3374,12 +3387,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Adapter(_ref) {
 	    var apiKey = _ref.apiKey;
 	    var apiBase = _ref.apiBase;
+	    var origin = _ref.origin;
 	    var storage = _ref.storage;
 
 	    _classCallCheck(this, Adapter);
 
 	    this.apiKey = apiKey;
 	    this.apiBase = apiBase;
+	    this.origin = origin;
 	    this.storage = storage;
 
 	    /* Lifecycle Specific State */
@@ -3489,7 +3504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this5 = this;
 
 	      return this.storage.getItem('customerToken').then(function (customerToken) {
-	        _this5.customerToken = customerToken;
+	        return _this5.customerToken = customerToken;
 	      });
 	    }
 	  }, {
@@ -3515,6 +3530,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'headers',
 	    value: function headers() {
 	      var headers = { 'Brandibble-Api-Key': this.apiKey, 'Content-Type': 'application/json' };
+	      if (this.origin) {
+	        headers['Origin'] = this.origin;
+	      }
 	      if (this.customerToken) {
 	        headers['Brandibble-Customer-Token'] = this.customerToken;
 	      }
@@ -3564,7 +3582,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var ASAP_STRING = 'asap';
-	var ISO8601_PATTERN = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
 
 	var Order = function () {
 	  function Order(adapter, location_id) {
@@ -3616,7 +3633,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.requestedAt = ASAP_STRING;
 	        return this.adapter.persistCurrentOrder(this);
 	      } else {
-	        var result = (0, _validate2.default)({ timestamp: timestampOrAsap }, { timestamp: { format: ISO8601_PATTERN } });
+	        var result = (0, _validate2.default)({ timestamp: timestampOrAsap }, { timestamp: { format: _utils.ISO8601_PATTERN } });
 	        if (!result) {
 	          this.requestedAt = timestampOrAsap;
 	          return this.adapter.persistCurrentOrder(this);
@@ -21466,7 +21483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 21 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -21475,6 +21492,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _utils = __webpack_require__(3);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21487,11 +21506,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _createClass(Locations, [{
 	    key: 'index',
-	    value: function index(lat, lng) {
-	      if (lat && lng) {
-	        return this.adapter.request('GET', 'locations?latitude=' + lat + '&longitude=' + lng);
+	    value: function index(queryParamObject) {
+	      if (queryParamObject) {
+	        return this.adapter.request('GET', 'locations?' + (0, _utils.queryStringBuilder)(queryParamObject));
 	      }
 	      return this.adapter.request('GET', 'locations');
+	    }
+	  }, {
+	    key: 'show',
+	    value: function show(locationId, lat, lng) {
+	      if (lat && lng) {
+	        return this.adapter.request('GET', 'locations/' + locationId + '?latitude=' + lat + '&longitude=' + lng);
+	      }
+	      return this.adapter.request('GET', 'locations/' + locationId);
 	    }
 	  }]);
 
@@ -21531,6 +21558,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function create(body) {
 	      return this.adapter.request('POST', 'customers/' + this.adapter.customerId() + '/addresses', body);
 	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete(customerAddressId) {
+	      return this.adapter.request('DELETE', 'customers/' + this.adapter.customerId() + '/addresses/' + customerAddressId);
+	    }
 	  }]);
 
 	  return Addresses;
@@ -21540,7 +21572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 23 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -21549,6 +21581,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _validate = __webpack_require__(7);
+
+	var _validate2 = _interopRequireDefault(_validate);
+
+	var _utils = __webpack_require__(3);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21565,7 +21605,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var service_type = arguments.length <= 1 || arguments[1] === undefined ? 'delivery' : arguments[1];
 	      var date = arguments.length <= 2 || arguments[2] === undefined ? new Date() : arguments[2];
 
-	      var requested_at = date.toISOString().split('.')[0] + 'Z';
+	      var isISOString = (0, _validate2.default)({ timestamp: date }, { timestamp: { format: _utils.ISO8601_PATTERN } });
+	      var requested_at = isISOString ? date.toISOString().split('.')[0] + 'Z' : date;
 	      return this.adapter.request('POST', 'menus', { location_id: location_id, service_type: service_type, requested_at: requested_at });
 	    }
 	  }]);

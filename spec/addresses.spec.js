@@ -23,6 +23,35 @@ describe('Addresses', () => {
     });
   });
 
+  it('can delete an existing address', done => {
+    const { email, password } = TestingUser;
+    Brandibble.customers.authenticate({
+      email,
+      password
+    }).then(response => {
+      let data = shouldSucceed(response);
+      Brandibble.addresses.create({
+        street_address: '69 Street St',
+        unit: '1 FL',
+        city: 'New York',
+        state_code: 'NY',
+        zip_code: 10013,
+        latitude: 40.755912,
+        longitude: -73.9709333,
+        company: 'Hello Computer',
+        contact_name: 'Steve Francis',
+        contact_phone: '5512213610'
+      }).then(response => {
+        let addressToDelete = response.data[0];
+        let { customer_address_id } = addressToDelete;
+        Brandibble.addresses.delete(customer_address_id).then(response => {
+          expect(response).to.be.true;
+          done();
+        })
+      })
+    });
+  });
+
   it('will fail when there is no current customer', done => {
     Brandibble.addresses.all().catch(response => {
       let errors = shouldError(response);
