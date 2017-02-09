@@ -3381,6 +3381,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.apiKey = apiKey;
 	    this.apiBase = apiBase;
 	    this.storage = storage;
+
+	    /* Lifecycle Specific State */
+	    this.currentOrder = null;
+	    this.customerToken = null;
 	  }
 
 	  _createClass(Adapter, [{
@@ -3395,12 +3399,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'flushAll',
 	    value: function flushAll() {
-	      return this.storage.clear();
+	      var _this = this;
+
+	      return this.storage.clear().then(function (res) {
+	        _this.currentOrder = null;
+	        _this.customerToken = null;
+	        return res;
+	      });
 	    }
 	  }, {
 	    key: 'restoreCurrentOrder',
 	    value: function restoreCurrentOrder() {
-	      var _this = this;
+	      var _this2 = this;
 
 	      return this.storage.getItem('currentOrder').then(function (serializedOrder) {
 	        if (!serializedOrder) return;
@@ -3418,7 +3428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var creditCard = _CircularJSON$parse.creditCard;
 
 
-	        var order = new _order2.default(_this, locationId, serviceType, paymentType, miscOptions);
+	        var order = new _order2.default(_this2, locationId, serviceType, paymentType, miscOptions);
 	        if (address) {
 	          order.address = address;
 	        }
@@ -3434,14 +3444,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (creditCard) {
 	          order.creditCard = creditCard;
 	        }
-	        _this.currentOrder = order.rehydrateCart(cart);
-	        return _this.currentOrder;
+	        _this2.currentOrder = order.rehydrateCart(cart);
+	        return _this2.currentOrder;
 	      });
 	    }
 	  }, {
 	    key: 'persistCurrentOrder',
 	    value: function persistCurrentOrder(order) {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      this.currentOrder = order;
 	      /* Ensure raw Credit Card data isn't persisted to this.storage */
@@ -3450,7 +3460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var creditCardData = Object.assign({}, order.creditCard);
 
 	          return {
-	            v: _this2.storage.setItem('currentOrder', _circularJson2.default.stringify(sanitizeCreditCard(order))).then(function () {
+	            v: _this3.storage.setItem('currentOrder', _circularJson2.default.stringify(sanitizeCreditCard(order))).then(function () {
 	              order.creditCard = creditCardData;
 	              return order;
 	            })
@@ -3466,33 +3476,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'flushCurrentOrder',
 	    value: function flushCurrentOrder() {
-	      return this.storage.removeItem('currentOrder');
+	      var _this4 = this;
+
+	      return this.storage.removeItem('currentOrder').then(function (res) {
+	        _this4.currentOrder = null;
+	        return res;
+	      });
 	    }
 	  }, {
 	    key: 'restoreCustomerToken',
 	    value: function restoreCustomerToken() {
-	      var _this3 = this;
+	      var _this5 = this;
 
 	      return this.storage.getItem('customerToken').then(function (customerToken) {
-	        _this3.customerToken = customerToken;
+	        _this5.customerToken = customerToken;
 	      });
 	    }
 	  }, {
 	    key: 'persistCustomerToken',
 	    value: function persistCustomerToken(customerToken) {
-	      var _this4 = this;
+	      var _this6 = this;
 
 	      return this.storage.setItem('customerToken', customerToken).then(function (token) {
-	        _this4.customerToken = token;
-	      });
-	    }
-	  }, {
-	    key: 'flushCustomerToken',
-	    value: function flushCustomerToken() {
-	      var _this5 = this;
-
-	      return this.flushAll().then(function () {
-	        _this5.customerToken = null;
+	        _this6.customerToken = token;
 	      });
 	    }
 	  }, {
@@ -21217,7 +21223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this2 = this;
 
 	      return new Promise(function (resolve) {
-	        _this2.adapter.flushCustomerToken().then(resolve);
+	        _this2.adapter.flushAll().then(resolve);
 	      });
 	    }
 	  }, {

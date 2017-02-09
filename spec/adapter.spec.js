@@ -45,4 +45,14 @@ describe('Adapter', () => {
       });
     }).catch(error => console.log(error));
   })
+
+  it('can will flush lifecycle specific state when flushAll is called', done => {
+    configureTestingOrder(Brandibble).then(order => {
+      expect(Brandibble.adapter.currentOrder).to.equal(order);
+      Brandibble.adapter.flushAll().then(() => {
+        expect(Brandibble.adapter.currentOrder).to.be.null;
+        done();
+      });
+    }).catch(error => console.log(error));
+  })
 });
