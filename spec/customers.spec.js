@@ -152,7 +152,8 @@ describe('Customers', () => {
     });
   });
 
-  it('can retrieve a users orders', done => {
+  it('can retrieve a users orders', function(done) {
+    this.timeout(10000);
     Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
       password: 'password'
@@ -169,7 +170,8 @@ describe('Customers', () => {
     });
   });
 
-  it('can retrieve a users upcoming orders', done => {
+  it('can retrieve a users upcoming orders', function(done) {
+    this.timeout(10000);
     Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
       password: 'password'
