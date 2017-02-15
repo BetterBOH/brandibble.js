@@ -37,7 +37,10 @@
     "lodash.filter": "^4.6.0",
     "lodash.find": "^4.6.0",
     "lodash.map": "^4.6.0",
+    "lodash.reduce": "^4.6.0",
     "lodash.reject": "^4.6.0",
+    "lodash.reverse": "^4.0.1",
+    "lodash.sortby": "^4.7.0",
     "validate.js": "^0.10.0",
     "whatwg-fetch": "^1.0.0"
   }

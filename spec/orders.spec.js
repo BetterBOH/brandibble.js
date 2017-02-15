@@ -6,7 +6,8 @@ describe('Orders', () => {
     done();
   });
 
-  it('an authenticated client can submit an order', done => {
+  it('an authenticated client can submit an order', function(done) {
+    this.timeout(10000);
     const { email, password } = TestingUser;
     Brandibble.customers.authenticate({
       email,
