@@ -3373,14 +3373,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (statusText === 'NO CONTENT') {
 	      return true;
 	    }
-	    return response.json();
+	    try {
+	      return response.json();
+	    } catch (e) {
+	      return "Brandibble.js: Response body could not be parsed as JSON.";
+	    }
 	  }
 	  if (status === 500) {
 	    throw FiveHundredError;
 	  }
-	  return response.json().then(function (error) {
-	    throw error;
-	  });
+	  try {
+	    return response.json().then(function (error) {
+	      throw error;
+	    });
+	  } catch (e) {
+	    throw "Brandibble.js: Response body could not be parsed as JSON.";
+	  }
 	}
 
 	var Adapter = function () {
