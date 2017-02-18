@@ -3376,7 +3376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    try {
 	      return response.json();
 	    } catch (e) {
-	      return "Brandibble.js: Response body could not be parsed as JSON.";
+	      return 'Brandibble.js: Response body could not be parsed as JSON. (Status Code: ' + status + ')';
 	    }
 	  }
 	  if (status === 500) {
@@ -3387,7 +3387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw error;
 	    });
 	  } catch (e) {
-	    throw "Brandibble.js: Response body could not be parsed as JSON.";
+	    throw 'Brandibble.js: Response body could not be parsed as JSON. (Status Code: ' + status + ')';
 	  }
 	}
 
