@@ -3370,7 +3370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var statusText = response.statusText;
 
 	  if (status >= 200 && status < 300) {
-	    if (statusText === 'NO CONTENT') {
+	    if (statusText === 'NO CONTENT' || status === 204) {
 	      return true;
 	    }
 	    try {
