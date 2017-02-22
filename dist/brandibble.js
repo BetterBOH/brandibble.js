@@ -22308,6 +22308,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function all() {
 	      return this.adapter.request('GET', 'allergens');
 	    }
+	  }, {
+	    key: 'create',
+	    value: function create(allergensArr) {
+	      var data = {
+	        allergens: allergensArr
+	      };
+	      return this.adapter.request('POST', 'customers/' + this.adapter.customerId() + '/allergens', data);
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove(allergensArr) {
+	      var data = {
+	        allergens: allergensArr
+	      };
+	      return this.adapter.request('DELETE', 'customers/' + this.adapter.customerId() + '/allergens', data);
+	    }
 	  }]);
 
 	  return Allergens;
