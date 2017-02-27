@@ -159,3 +159,9 @@ There are only two methods that you can do on an Order:
 
 - `Brandibble.orders.validate(BrandibbleOrderModel)`
 - `Brandibble.orders.submit(BrandibbleOrderModel)`
+
+---
+
+### Testing
+- **IMPORTANT:** Set an environment variable called `API_KEY` with your Brandibble API key before running tests.
+- `npm test`

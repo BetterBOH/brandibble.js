@@ -20,7 +20,7 @@ export const TestingAddress = {
   contact_phone: '5512213610'
 };
 
-export const UnsecureApiKey = 'eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ5ODU4MzQ0MiwiaWF0IjoxNDY3MDQ3NDQyfQ.eyJlbWFpbCI6Imh1Z2hAc2FuY3R1YXJ5Y29tcHV0ZXIuY29tIiwiZG9tYWluIjoiaHR0cHM6Ly9zYW5jdHVhcnkuY29tcHV0ZXIiLCJhcGlfdXNlcl9pZCI6MywibmFtZSI6IlNhbmN0dWFyeSJ9.clbyJWm-gj4Z120isZhL-Zk1Voy80pJJWsHfgnqGaxk';
+export const UnsecureApiKey = process.env.API_KEY;
 
 export function seedEmail() {
   return `sanctuary-testing-${(new Date()).valueOf().toString()}@example.com`;

@@ -29,5 +29,7 @@ module.exports = {
       }
     ]
   },
-  plugins: []
+  plugins: [
+    new webpack.EnvironmentPlugin(['API_KEY'])
+  ]
 };
