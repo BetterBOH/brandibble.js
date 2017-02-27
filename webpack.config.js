@@ -12,21 +12,20 @@ module.exports = {
     libraryTarget: 'umd'
   },
   resolve: {
-    root: path.resolve(__dirname),
-    extensions: ['', '.js', '.json'],
+    modules: [
+      path.resolve(__dirname),
+      'node_modules'
+    ],
+    extensions: ['.js', '.json'],
     alias: { brandibble: 'lib' }
   },
   module: {
-    loaders: [
-      {include: /\.json$/, loaders: ["json-loader"]},
+    rules: [
       {
         test: /\.js/,
         exclude: /node_modules/,
-        loader: 'babel',
-        query: {
-          presets: ['es2015'],
-          plugins: []
-        }
+        include: /lib/,
+        loader: 'babel-loader'
       }
     ]
   },
