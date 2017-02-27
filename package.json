@@ -20,7 +20,6 @@
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-mocha": "^1.0.1",
-    "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "localforage": "^1.4.3",
