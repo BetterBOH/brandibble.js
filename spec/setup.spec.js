@@ -24,7 +24,7 @@ before(done => {
     storage: localforage,
   });
 
-  return BrandibbleRef.setup().then(BrandibbleRef => {
+  BrandibbleRef.setup().then(BrandibbleRef => {
     window.Brandibble = BrandibbleRef;
     BrandibbleRef.customers.create(TestingUser)
       .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist)
