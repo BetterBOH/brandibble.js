@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+/* global Brandibble expect it describe */
 import { UnsecureApiKey } from './helpers';
 
 // Brandibble Wrapper

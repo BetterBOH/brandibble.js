@@ -1,3 +1,5 @@
+/* global Brandibble expect it describe */
+/* eslint no-new:1 */
 import productJSON from './../product.stub';
 
 describe('LineItem', () => {

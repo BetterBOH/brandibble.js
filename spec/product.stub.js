@@ -1,3 +1,4 @@
+/* eslint quote-props: 1  */
 export default {
   "allergen_classes": "",
   "allergens": "",

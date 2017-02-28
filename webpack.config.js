@@ -1,3 +1,4 @@
+/* eslint no-path-concat:0 prefer-template:0 */
 const webpack = require('webpack');
 const path = require('path');
 

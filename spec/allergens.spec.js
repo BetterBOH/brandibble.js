@@ -1,4 +1,5 @@
-import { shouldSucceed, shouldError, TestingUser } from './helpers';
+/* global Brandibble expect it describe before */
+import { shouldSucceed, TestingUser } from './helpers';
 
 describe('Allergens', () => {
   it('exists', () => { expect(Brandibble.allergens).to.exist });

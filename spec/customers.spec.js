@@ -1,4 +1,4 @@
-import { retrieve } from '../lib/utils';
+/* global Brandibble expect it describe beforeEach window */
 import { seedEmail, seedText, shouldSucceed, shouldError } from './helpers';
 
 describe('Customers', () => {

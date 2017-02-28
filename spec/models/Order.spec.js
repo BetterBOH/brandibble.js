@@ -1,3 +1,4 @@
+/* global Brandibble expect it describe */
 import productJSON from './../product.stub';
 import locationJSON from './../location.stub';
 import { TestingAddress } from '../helpers';

@@ -1,3 +1,4 @@
+/* eslint quote-props: 1  */
 export default {
   "city": "New York",
   "cross_streets": "Between 112th and 113th",

@@ -1,3 +1,4 @@
+/* global expect */
 import { PaymentTypes } from '../lib/utils';
 
 export const TestingUser = {

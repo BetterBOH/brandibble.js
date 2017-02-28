@@ -1,4 +1,5 @@
-import { shouldSucceed, shouldError, TestingUser, configureTestingOrder } from './helpers';
+/* global Brandibble expect it describe beforeEach window */
+import { shouldSucceed, TestingUser, configureTestingOrder } from './helpers';
 
 describe('Orders', () => {
   it('exists', done => {

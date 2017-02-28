@@ -1,5 +1,5 @@
-import { retrieve } from '../lib/utils';
-import { seedEmail, seedText, shouldSucceed, shouldError, TestingUser } from './helpers';
+/* global Brandibble expect it describe beforeEach */
+import { shouldSucceed, shouldError, TestingUser } from './helpers';
 
 describe('Addresses', () => {
   beforeEach(done => {

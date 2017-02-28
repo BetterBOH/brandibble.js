@@ -1,4 +1,5 @@
-import { seedEmail, UnsecureApiKey, configureTestingOrder } from './helpers';
+/* global Brandibble expect it describe beforeEach */
+import { UnsecureApiKey, configureTestingOrder } from './helpers';
 
 describe('Adapter', () => {
   beforeEach(done => {
