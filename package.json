@@ -3,6 +3,10 @@
   "version": "1.4.0",
   "description": "API Wrapper for Brandibble.co",
   "repository": "https://github.com/sanctuarycomputer/brandibble.js",
+  "engines": {
+    "node": ">=7.6.0",
+    "npm": ">=4.3.0"
+  },
   "main": "dist/brandibble.js",
   "scripts": {
     "build": "webpack",
