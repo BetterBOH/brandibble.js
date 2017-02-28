@@ -1,5 +1,5 @@
 import moment from 'moment-timezone';
-import { buildRef, shouldSucceed, shouldError } from './helpers';
+import { shouldSucceed, shouldError } from './helpers';
 
 describe('Menus', () => {
   it('exists', () => { expect(Brandibble.menus).to.exist });

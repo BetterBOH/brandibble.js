@@ -2,35 +2,34 @@
 import { shouldSucceed, shouldError, TestingUser } from './helpers';
 
 describe('Addresses', () => {
-  beforeEach(done => {
-    Brandibble.customers.invalidate().then(done);
+  beforeEach(() => {
+    return Brandibble.customers.invalidate();
   });
 
   it('exists', () => expect(Brandibble.addresses).to.exist);
 
-  it('can show all addresses for a customer', done => {
+  it('can show all addresses for a customer', () => {
     const { email, password } = TestingUser;
-    Brandibble.customers.authenticate({
+    return Brandibble.customers.authenticate({
       email,
-      password
-    }).then(response => {
-      let data = shouldSucceed(response);
-      Brandibble.addresses.all().then(response => {
-        let data = shouldSucceed(response);
+      password,
+    }).then((response) => {
+      shouldSucceed(response);
+      return Brandibble.addresses.all().then((res) => {
+        const data = shouldSucceed(res);
         expect(data).to.be.a('array');
-        done();
       });
     });
   });
 
-  it('can delete an existing address', done => {
+  it('can delete an existing address', () => {
     const { email, password } = TestingUser;
-    Brandibble.customers.authenticate({
+    return Brandibble.customers.authenticate({
       email,
-      password
-    }).then(response => {
-      let data = shouldSucceed(response);
-      Brandibble.addresses.create({
+      password,
+    }).then((response) => {
+      shouldSucceed(response);
+      return Brandibble.addresses.create({
         street_address: '69 Street St',
         unit: '1 FL',
         city: 'New York',
@@ -40,51 +39,48 @@ describe('Addresses', () => {
         longitude: -73.9709333,
         company: 'Hello Computer',
         contact_name: 'Steve Francis',
-        contact_phone: '5512213610'
-      }).then(response => {
-        let addressToDelete = response.data[0];
-        let { customer_address_id } = addressToDelete;
-        Brandibble.addresses.delete(customer_address_id).then(response => {
-          expect(response).to.be.true;
-          done();
-        })
-      })
+        contact_phone: '5512213610',
+      }).then((res) => {
+        const addressToDelete = res.data[0];
+        const { customer_address_id } = addressToDelete;
+        return Brandibble.addresses.delete(customer_address_id).then((r) => {
+          expect(r).to.be.true;
+        });
+      });
     });
   });
 
-  it('will fail when there is no current customer', done => {
-    Brandibble.addresses.all().catch(response => {
-      let errors = shouldError(response);
+  it('will fail when there is no current customer', () => {
+    return Brandibble.addresses.all().catch((response) => {
+      const errors = shouldError(response);
       expect(errors).to.be.a('array').to.have.lengthOf(1);
       expect(errors[0]).to.have.property('code', 'customer_token.missing');
-      done();
     });
   });
 
-  it('will fail when requesting a different customer to the current', done => {
+  it('will fail when requesting a different customer to the current', () => {
     const { email, password } = TestingUser;
-    Brandibble.customers.authenticate({
+    return Brandibble.customers.authenticate({
       email,
-      password
-    }).then(response => {
-      let data = shouldSucceed(response);
-      Brandibble.adapter.request('GET', `customers/1/addresses`).catch(response => {
-        let errors = shouldError(response);
+      password,
+    }).then((response) => {
+      shouldSucceed(response);
+      return Brandibble.adapter.request('GET', 'customers/1/addresses').catch((res) => {
+        const errors = shouldError(res);
         expect(errors).to.be.a('array').to.have.lengthOf(1);
-        done();
       });
     });
   });
 
 
-  it('can create a new address for a customer', done => {
+  it('can create a new address for a customer', () => {
     const { email, password } = TestingUser;
-    Brandibble.customers.authenticate({
+    return Brandibble.customers.authenticate({
       email,
-      password
-    }).then(response => {
-      let data = shouldSucceed(response);
-      Brandibble.addresses.create({
+      password,
+    }).then((response) => {
+      shouldSucceed(response);
+      return Brandibble.addresses.create({
         street_address: '123 Street St',
         unit: '4 FL',
         city: 'New York',
@@ -94,13 +90,11 @@ describe('Addresses', () => {
         longitude: -73.9709333,
         company: 'Sanctuary Computer, Inc.',
         contact_name: 'Hugh Francis',
-        contact_phone: '5512213610'
-      }).then(response => {
-        let data = shouldSucceed(response);
+        contact_phone: '5512213610',
+      }).then((res) => {
+        const data = shouldSucceed(res);
         expect(data).to.be.a('array');
-        done();
       });
     });
   });
-
 });

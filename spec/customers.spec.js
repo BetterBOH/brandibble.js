@@ -6,182 +6,166 @@ describe('Customers', () => {
 
   it('exists', () => expect(Brandibble.customers).to.exist);
 
-  it('can create a customer', done => {
-    Brandibble.customers.create({
+  it('can create a customer', () => {
+    return Brandibble.customers.create({
       first_name: 'Sanctuary',
       last_name: 'Testing',
       email: seedEmail(),
-      password: 'password'
-    }).then(response => {
-      let data = shouldSucceed(response);
+      password: 'password',
+    }).then((response) => {
+      const data = shouldSucceed(response);
       expect(data).to.have.property('customer_id');
       expect(data).to.have.property('email');
       expect(data).to.have.property('first_name');
       expect(data).to.have.property('last_name');
       expect(data).to.have.property('phone');
-      done();
     });
   });
 
-  it('create fails with bad inputs', done => {
-    Brandibble.customers.create({
+  it('create fails with bad inputs', () => {
+    return Brandibble.customers.create({
       first_name: 'Sanctuary',
       last_name: 'Testing',
       email: 'nope',
-      password: 'password'
-    }).catch(response => {
-      let errors = shouldError(response);
+      password: 'password',
+    }).catch((response) => {
+      const errors = shouldError(response);
       expect(errors).to.be.a('array').to.have.lengthOf(2);
       expect(errors[0]).to.have.property('code', 'customers.create.validation');
-      expect(errors[1]).to.have.property('title', 'Please submit a valid email address.')
-      done();
+      expect(errors[1]).to.have.property('title', 'Please submit a valid email address.');
     });
   });
 
-  it('can retrieve a token', done => {
-    Brandibble.customers.token({
+  it('can retrieve a token', () => {
+    return Brandibble.customers.token({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let data = shouldSucceed(response);
+      password: 'password',
+    }).then((response) => {
+      const data = shouldSucceed(response);
       expect(data).to.have.property('token');
-      done();
     });
   });
 
-  it('fails to retrieve a token with bad inputs', done => {
-    Brandibble.customers.token({
+  it('fails to retrieve a token with bad inputs', () => {
+    return Brandibble.customers.token({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'nope'
-    }).catch(response => {
-      let errors = shouldError(response);
+      password: 'nope',
+    }).catch((response) => {
+      const errors = shouldError(response);
       expect(errors).to.be.a('array').to.have.lengthOf(2);
       expect(errors[0]).to.have.property('code', 'customers.login.validation');
-      done();
     });
   });
 
-  it('can authenticate the client with a current customer', done => {
-    Brandibble.customers.authenticate({
+  it('can authenticate the client with a current customer', async () => {
+    const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let data = shouldSucceed(response);
-      expect(data).to.have.property('email', 'sanctuary-testing-customer@example.com');
-
-      // Customer Token is set in local storage
-      expect(Brandibble.adapter.customerToken).to.be.a('string');
-
-      Brandibble.customers.invalidate().then(() => {
-        expect(Brandibble.adapter.customerToken).to.not.exist;
-        done();
-      });
+      password: 'password',
     });
+    const data = await shouldSucceed(response);
+
+    expect(data).to.have.property('email', 'sanctuary-testing-customer@example.com');
+    // Customer Token is set in local storage
+    expect(Brandibble.adapter.customerToken).to.be.a('string');
+
+    await Brandibble.customers.invalidate();
+    expect(Brandibble.adapter.customerToken).to.not.exist;
   });
 
-  it('can validate a customers metadata', done => {
-    Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example.com' }).then(response => {
-      let data = shouldSucceed(response);
-      expect(data).to.have.property('is_brandibble_active');
-      expect(data).to.have.property('is_brandibble_customer');
-      expect(data).to.have.property('is_levelup_connected');
-      expect(data).to.have.property('is_levelup_user');
-      expect(data).to.have.property('levelup_connected_email');
-      done();
-    });
+  it('can validate a customers metadata', async () => {
+    const response = await Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example.com' });
+    const data = await shouldSucceed(response);
+    expect(data).to.have.property('is_brandibble_active');
+    expect(data).to.have.property('is_brandibble_customer');
+    expect(data).to.have.property('is_levelup_connected');
+    expect(data).to.have.property('is_levelup_user');
+    expect(data).to.have.property('levelup_connected_email');
   });
 
-  it('cannot validate a customers metadata when email is invalid', done => {
-    Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example' }).catch(response => {
-      let errors = shouldError(response);
+  it('cannot validate a customers metadata when email is invalid', () => {
+    return Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example' }).catch((response) => {
+      const errors = shouldError(response);
       expect(errors).to.be.a('array').to.have.lengthOf(1);
       expect(errors[0]).to.have.property('code', 'customers.validate.invalid_email');
-      done();
     });
   });
 
-  it('can trigger a customers reset password flow', done => {
-    Brandibble.customers.resetPassword({ email: "sanctuary-testing-customer@example.com" }).then(response => {
-      expect(response).to.be.true;
-      done();
-    });
+  it('can trigger a customers reset password flow', async () => {
+    const response = await Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' }).catch(console.log);
+    expect(response).to.be.true;
+    // return Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' }).then((response) => {
+    //   expect(response).to.be.true;
+    // });
   });
 
-  it('can not show a customer that does not belong to the current token', done => {
-    Brandibble.customers.authenticate({
+  it('can not show a customer that does not belong to the current token', () => {
+    return Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      Brandibble.customers.show(1).catch(response => {
-        let errors = shouldError(response);
+      password: 'password',
+    }).then(() => {
+      return Brandibble.customers.show(1).catch((response) => {
+        const errors = shouldError(response);
         expect(errors).to.have.lengthOf(1);
         expect(errors[0]).to.have.property('code', 'customers.show.token_mismatch');
-        done();
       });
     });
   });
 
-  it('can update the current customer', done => {
-    Brandibble.customers.authenticate({
+  it('can update the current customer', () => {
+    return Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let newLastName = seedText();
-      Brandibble.customers.updateCurrent({
-        last_name: newLastName
-      }).then(response => {
-        let data = shouldSucceed(response);
+      password: 'password',
+    }).then(() => {
+      const newLastName = seedText();
+      return Brandibble.customers.updateCurrent({
+        last_name: newLastName,
+      }).then((response) => {
+        const data = shouldSucceed(response);
         expect(data.last_name).to.be.a('string', newLastName);
-        done();
       });
     });
   });
 
-  it('can not update a customer that does not own the current token', done => {
-    Brandibble.customers.authenticate({
+  it('can not update a customer that does not own the current token', () => {
+    return Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let newLastName = seedText();
-      Brandibble.customers.update({ last_name: newLastName }, 5).catch(response => {
-        let errors = shouldError(response);
+      password: 'password',
+    }).then(() => {
+      const newLastName = seedText();
+      return Brandibble.customers.update({ last_name: newLastName }, 5).catch((response) => {
+        const errors = shouldError(response);
         expect(errors).to.have.lengthOf(1);
         expect(errors[0]).to.have.property('code', 'customers.update.token_mismatch');
-        done();
       });
     });
   });
 
-  it('can retrieve a users orders', function(done) {
+  it('can retrieve a users orders', async function () {
     this.timeout(10000);
-    Brandibble.customers.authenticate({
+    const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let customerId = response.data.customer_id;
-      Brandibble.customers.orders(customerId).then(response => {
-        let data = shouldSucceed(response);
-        expect(data).to.be.array;
-        expect(data[0]).to.have.property('address');
-        expect(data[0]).to.have.property('items');
-        expect(data[0]).to.have.property('orders_id');
-        done();
-      });
+      password: 'password',
     });
+    const { customer_id } = response.data;
+    const data = await Brandibble.customers.orders(customer_id);
+    const orders = await shouldSucceed(data);
+
+    expect(orders).to.be.array;
+    expect(orders[0]).to.have.property('address');
+    expect(orders[0]).to.have.property('items');
+    expect(orders[0]).to.have.property('orders_id');
   });
 
-  it('can retrieve a users upcoming orders', function(done) {
+
+  it('can retrieve a users upcoming orders', async function () {
     this.timeout(10000);
-    Brandibble.customers.authenticate({
+    const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
-      password: 'password'
-    }).then(response => {
-      let customerId = response.data.customer_id;
-      Brandibble.customers.orders(customerId, {status:'upcoming'}).then(response => {
-        let data = shouldSucceed(response);
-        expect(data).to.be.array;
-        done();
-      });
+      password: 'password',
     });
+    const { customer_id } = response.data;
+    const data = await Brandibble.customers.orders(customer_id, { status: 'upcoming' });
+    const orders = await shouldSucceed(data);
+    expect(orders).to.be.array;
   });
 });

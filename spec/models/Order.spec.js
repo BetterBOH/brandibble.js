@@ -3,133 +3,112 @@ import productJSON from './../product.stub';
 import locationJSON from './../location.stub';
 import { TestingAddress } from '../helpers';
 
-const defaultOptions = {
-  include_utensils: true,
-  notes_for_store: "",
-  tip: 0
-};
-
-const validTimestamp = `${(new Date()).toISOString().split('.')[0]}Z`;
-const invalidTimestamp = new Date();
-
 describe('Order', () => {
   it('can add a LineItem', () => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     newOrder.addLineItem(productJSON);
     expect(newOrder.cart.lineItems).to.have.lengthOf(1);
   });
 
-  it('can get quantity', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.addLineItem(productJSON, 3).then(lineItem => {
+  it('can get quantity', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.addLineItem(productJSON, 3).then((lineItem) => {
       expect(newOrder.getLineItemQuantity(lineItem)).to.equal(3);
-      done();
     });
   });
 
-  it('can set quantity', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.addLineItem(productJSON, 1).then(lineItem => {
+  it('can set quantity', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.addLineItem(productJSON, 1).then((lineItem) => {
       expect(newOrder.getLineItemQuantity(lineItem)).to.equal(1);
-      newOrder.setLineItemQuantity(lineItem, 3).then(newQuantity => {
+      return newOrder.setLineItemQuantity(lineItem, 3).then(() => {
         expect(newOrder.getLineItemQuantity(lineItem)).to.equal(3);
-        done();
-      }).catch(error => {
-        console.log(error) ;
+      }).catch((error) => {
+        console.log(error);
       });
     });
   });
 
-  it('can remove a LineItem', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.addLineItem(productJSON).then(lineItem => {
+  it('can remove a LineItem', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.addLineItem(productJSON).then((lineItem) => {
       expect(newOrder.cart.lineItems).to.have.lengthOf(1);
-      newOrder.removeLineItem(lineItem).then(() => {
+      return newOrder.removeLineItem(lineItem).then(() => {
         expect(newOrder.cart.lineItems).to.have.lengthOf(0);
-        done();
       }).catch(error => console.log(error));
     }).catch(error => console.log(error));
   });
 
-  it('does not validate when IDs are passed for customers', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setCustomer({customer_id: 123}).then(savedOrder => {
+  it('does not validate when IDs are passed for customers', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setCustomer({ customer_id: 123 }).then((savedOrder) => {
       expect(savedOrder.customer.customer_id).to.exist;
-      done();
     });
   });
 
-  it('can set location id', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setLocation(19).then(savedOrder => {
+  it('can set location id', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setLocation(19).then((savedOrder) => {
       expect(savedOrder.locationId).to.equal(19);
-      done();
     });
   });
 
-  it('returns true for valid request at timestamp', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
-    let requestedAtTime = `${(new Date()).toISOString().split('.')[0]}Z`;
+  it('returns true for valid request at timestamp', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    const requestedAtTime = `${(new Date()).toISOString().split('.')[0]}Z`;
 
-    newOrder.setRequestedAt(requestedAtTime).then(order => {
+    return newOrder.setRequestedAt(requestedAtTime).then(() => {
       expect(newOrder.requestedAt).to.equal(requestedAtTime);
-      done();
     });
   });
 
-  it('returns errors for invalid request at timestamp', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
-    let requestedAtTime = new Date();
+  it('returns errors for invalid request at timestamp', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    const requestedAtTime = new Date();
 
-    newOrder.setRequestedAt(requestedAtTime).catch(errors => {
+    return newOrder.setRequestedAt(requestedAtTime).catch((errors) => {
       expect(errors).to.have.keys(['timestamp']);
-      done();
-    })
+    });
   });
 
-  it('returns errors for invalid customers', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setCustomer({invalidKey: 'hi'}).catch(errors => {
+  it('returns errors for invalid customers', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setCustomer({ invalidKey: 'hi' }).catch((errors) => {
       expect(errors).to.have.keys(['first_name', 'last_name', 'password', 'email']);
-      done();
-    })
+    });
   });
 
-  it('returns true for valid customers', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    let customer = {
+  it('returns true for valid customers', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    const customer = {
       first_name: 'Hugh',
       last_name: 'Francis',
       email: 'hugh@hugh.co',
-      password: 'pizzapasta'
+      password: 'pizzapasta',
     };
-    newOrder.setCustomer(customer).then(order => {
+    return newOrder.setCustomer(customer).then(() => {
       expect(newOrder.customer).to.have.keys(['first_name', 'last_name', 'password', 'email']);
-      done();
     });
   });
 
-  it('does not validate when IDs are passed for address', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setAddress({customer_address_id: 123}).then(savedOrder => {
+  it('does not validate when IDs are passed for address', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setAddress({ customer_address_id: 123 }).then((savedOrder) => {
       expect(savedOrder.address.customer_address_id).to.exist;
-      done();
     });
   });
 
-  it('returns errors for invalid addresses', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setAddress({invalidKey: 'hi'}).catch(errors => {
+  it('returns errors for invalid addresses', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setAddress({ invalidKey: 'hi' }).catch((errors) => {
       expect(errors).to.be.an('object');
-      done();
-    })
+    });
   });
 
-  it('returns true for valid addresses', done => {
-    let newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setAddress(TestingAddress).then(order => {
+  it('returns true for valid addresses', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.setAddress(TestingAddress).then(() => {
       expect(newOrder.address).to.deep.equal(TestingAddress);
-      done();
     });
   });
 });

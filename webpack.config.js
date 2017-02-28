@@ -5,20 +5,20 @@ const path = require('path');
 module.exports = {
   entry: [
     'whatwg-fetch',
-    './lib/brandibble'
+    './lib/brandibble',
   ],
   output: {
     path: __dirname + '/dist',
-    filename: "brandibble.js",
-    libraryTarget: 'umd'
+    filename: 'brandibble.js',
+    libraryTarget: 'umd',
   },
   resolve: {
     modules: [
       path.resolve(__dirname),
-      'node_modules'
+      'node_modules',
     ],
     extensions: ['.js', '.json'],
-    alias: { brandibble: 'lib' }
+    alias: { brandibble: 'lib' },
   },
   module: {
     rules: [
@@ -26,11 +26,11 @@ module.exports = {
         test: /\.js/,
         exclude: /node_modules/,
         include: /lib/,
-        loaders: ['babel-loader', 'eslint-loader']
-      }
-    ]
+        loaders: ['babel-loader', 'eslint-loader'],
+      },
+    ],
   },
   plugins: [
-    new webpack.EnvironmentPlugin(['API_KEY'])
-  ]
+    new webpack.EnvironmentPlugin(['API_KEY']),
+  ],
 };

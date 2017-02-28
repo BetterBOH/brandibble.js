@@ -15,19 +15,18 @@ function ensureCustomerResourcesExist() {
   }).catch(error => console.log(error));
 }
 
-before(done => {
+before( async () => {
   // Setup a Brandibble Ref, and add it to the Window
-  let BrandibbleRef = new Brandibble({
+  const BrandibbleRef = await new Brandibble({
     apiKey: UnsecureApiKey,
     brandId: 6,
     apiEndpoint: 'https://staging.brandibble.co/api/',
     storage: localforage,
   });
 
-  BrandibbleRef.setup().then(BrandibbleRef => {
-    window.Brandibble = BrandibbleRef;
-    BrandibbleRef.customers.create(TestingUser)
-      .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist)
-      .then(() => done());
+  return BrandibbleRef.setup().then(Brandibble => {
+    window.Brandibble = Brandibble;
+    Brandibble.customers.create(TestingUser)
+      .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist);
   }).catch(error => console.log(error));
 });
