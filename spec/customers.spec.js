@@ -93,9 +93,6 @@ describe('Customers', () => {
   it('can trigger a customers reset password flow', async () => {
     const response = await Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' }).catch(console.log);
     expect(response).to.be.true;
-    // return Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' }).then((response) => {
-    //   expect(response).to.be.true;
-    // });
   });
 
   it('can not show a customer that does not belong to the current token', () => {
