@@ -34,6 +34,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.EnvironmentPlugin(['API_KEY']),
+    new webpack.EnvironmentPlugin(['BRANDIBBLE_API_KEY']),
   ],
 };
