@@ -7,7 +7,7 @@ module.exports = {
     './lib/brandibble',
   ],
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(__dirname, 'dist'),
     filename: 'brandibble.js',
     libraryTarget: 'umd',
   },
@@ -24,7 +24,10 @@ module.exports = {
       {
         test: /\.js/,
         exclude: /node_modules/,
-        include: /lib/,
+        include: [
+          path.join(__dirname, 'lib'),
+          path.join(__dirname, 'spec'),
+        ],
         use: ['babel-loader', 'eslint-loader'],
       },
     ],
