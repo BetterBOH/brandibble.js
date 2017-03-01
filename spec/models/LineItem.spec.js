@@ -70,6 +70,9 @@ describe('LineItem', () => {
     expect(lineItem.operationMaps[0].currentlySelectedCount).to.equal(0);
     expect(lineItem.operationMaps[0].canAddMoreToThisGroup).to.equal(true);
 
+    const bases = lineItem.optionGroups()[0];
+    lineItem.addOption(bases, bases.option_items[0]);
+
     expect(lineItem.operationMaps[0].currentlySelectedCount).to.equal(1);
     expect(lineItem.operationMaps[0].canAddMoreToThisGroup).to.equal(false);
   });
@@ -81,6 +84,9 @@ describe('LineItem', () => {
     expect(lineItem.operationMaps[saucesIndex].canAddMoreToThisGroup).to.equal(true);
     expect(lineItem.operationMaps[saucesIndex].remainingIncludedOptions).to.equal(1);
     expect(lineItem.operationMaps[saucesIndex].extraOptionsWillIncurCost).to.equal(false);
+
+    const sauces = lineItem.optionGroups()[saucesIndex];
+    lineItem.addOption(sauces, sauces.option_items[0]);
 
     expect(lineItem.operationMaps[saucesIndex].currentlySelectedCount).to.equal(1);
     expect(lineItem.operationMaps[saucesIndex].canAddMoreToThisGroup).to.equal(true);
