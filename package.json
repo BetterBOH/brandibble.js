@@ -10,7 +10,6 @@
   "main": "dist/brandibble.js",
   "scripts": {
     "build": "webpack",
-    "prepublish": "npm run build",
     "test": "npm run build && node ./node_modules/karma/bin/karma start"
   },
   "author": "Hugh Francis <me@hughfrancis.me> (http://hughfrancis.me/)",
