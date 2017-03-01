@@ -1,4 +1,3 @@
-/* eslint no-path-concat:0 prefer-template:0 */
 const webpack = require('webpack');
 const path = require('path');
 
@@ -8,7 +7,7 @@ module.exports = {
     './lib/brandibble',
   ],
   output: {
-    path: __dirname + '/dist',
+    path: path.resolve(__dirname, 'dist'),
     filename: 'brandibble.js',
     libraryTarget: 'umd',
   },

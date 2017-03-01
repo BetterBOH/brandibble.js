@@ -11,6 +11,7 @@ module.exports = (config) => {
       'spec/**/*.spec.js',
     ],
     plugins: [
+      'karma-babel-preprocessor',
       'karma-chrome-launcher',
       'karma-chai',
       'karma-mocha',
@@ -18,7 +19,7 @@ module.exports = (config) => {
       'karma-webpack',
     ],
     preprocessors: {
-      'spec/**/*.spec.js': ['webpack', 'sourcemap'],
+      'spec/**/*.spec.js': ['babel', 'webpack', 'sourcemap'],
     },
     colors: true,
     logLevel: config.LOG_INFO,
