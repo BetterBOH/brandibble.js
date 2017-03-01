@@ -13,10 +13,10 @@ module.exports = {
   },
   resolve: {
     modules: [
-      path.resolve(__dirname),
       'node_modules',
+      path.resolve(__dirname),
     ],
-    extensions: ['.js', '.json'],
+    extensions: ['.js'],
     alias: { brandibble: 'lib' },
   },
   module: {
@@ -25,7 +25,7 @@ module.exports = {
         test: /\.js/,
         exclude: /node_modules/,
         include: /lib/,
-        loaders: ['babel-loader', 'eslint-loader'],
+        use: ['babel-loader', 'eslint-loader'],
       },
     ],
   },
