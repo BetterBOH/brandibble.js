@@ -19,7 +19,6 @@ module.exports = (config) => {
     ],
     preprocessors: {
       'spec/**/*.spec.js': ['webpack', 'sourcemap'],
-      'lib/**/*.js': ['webpack', 'sourcemap'],
     },
     colors: true,
     logLevel: config.LOG_INFO,
