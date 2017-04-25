@@ -1,19 +1,27 @@
-/* global Brandibble expect it describe */
+/* global Brandibble expect it describe beforeEach */
 /* eslint no-new:1 */
 import productJSON from './../product.stub';
 
-describe('LineItem', () => {
+let bases;
+let lineItem;
+let sauces;
+let sides;
+
+describe('models/lineItem', () => {
+  beforeEach(() => {
+    lineItem = new Brandibble.LineItem(productJSON, 1);
+    bases = lineItem.optionGroups()[0];
+    sides = lineItem.optionGroups()[1];
+    sauces = lineItem.optionGroups()[2];
+  });
+
   it('can add option and increase quantity of option items', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const sides = lineItem.optionGroups()[1];
     lineItem.addOption(sides, sides.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
     expect(lineItem.configuration[0].optionItems).to.have.length.of(2);
   });
 
   it('can remove option and decrease quantity of option items', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const sides = lineItem.optionGroups()[1];
     lineItem.addOption(sides, sides.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
     lineItem.removeOption(sides.option_items[0]);
@@ -21,15 +29,12 @@ describe('LineItem', () => {
   });
 
   it('handles validity', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     expect(lineItem.isValid()).to.equal(false);
     expect(lineItem.errors()).to.be.an('array');
     expect(lineItem.errors()).to.have.length.of.at.least(2);
 
     expect(lineItem.errors()[0]).to.have.keys(['error', 'subject', 'subjectType', 'relatedConfiguration']);
 
-    const bases = lineItem.optionGroups()[0];
-    const sides = lineItem.optionGroups()[1];
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
 
@@ -39,22 +44,17 @@ describe('LineItem', () => {
   });
 
   it('allows products with an empty option_groups array', () => {
-    const lineItem = new Brandibble.LineItem({ id: 1, option_groups: [] }, 1);
+    lineItem = new Brandibble.LineItem({ id: 1, option_groups: [] }, 1);
     expect(lineItem.isValid()).to.equal(true);
   });
 
   it('can format itself', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const bases = lineItem.optionGroups()[0];
-    const sides = lineItem.optionGroups()[1];
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
     expect(lineItem.format()).to.contain.all.keys(['id', 'made_for', 'instructions', 'quantity', 'option_groups']);
   });
 
   it('it can not violate an option rule', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const bases = lineItem.optionGroups()[0];
     lineItem.addOption(bases, bases.option_items[0]);
 
     expect(() => {
@@ -63,9 +63,6 @@ describe('LineItem', () => {
   });
 
   it('can remove options', async () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const bases = lineItem.optionGroups()[0];
-    const sides = lineItem.optionGroups()[1];
     await lineItem.addOption(bases, bases.option_items[0]);
     await lineItem.addOption(sides, sides.option_items[0]);
     expect(lineItem.isValid()).to.equal(true);
@@ -78,16 +75,13 @@ describe('LineItem', () => {
   });
 
   it('will maintains an operation map', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     expect(lineItem.operationMaps[0].currentlySelectedCount).to.equal(0);
   });
 
   it('will maintain relevant counts for each option group in the operationsMap', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     expect(lineItem.operationMaps[0].currentlySelectedCount).to.equal(0);
     expect(lineItem.operationMaps[0].canAddMoreToThisGroup).to.equal(true);
 
-    const bases = lineItem.optionGroups()[0];
     lineItem.addOption(bases, bases.option_items[0]);
 
     expect(lineItem.operationMaps[0].currentlySelectedCount).to.equal(1);
@@ -95,14 +89,13 @@ describe('LineItem', () => {
   });
 
   it('will maintain counts for included vs paid options in the operationsMap', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     const saucesIndex = 2;
     expect(lineItem.operationMaps[saucesIndex].currentlySelectedCount).to.equal(0);
     expect(lineItem.operationMaps[saucesIndex].canAddMoreToThisGroup).to.equal(true);
     expect(lineItem.operationMaps[saucesIndex].remainingIncludedOptions).to.equal(1);
     expect(lineItem.operationMaps[saucesIndex].extraOptionsWillIncurCost).to.equal(false);
 
-    const sauces = lineItem.optionGroups()[saucesIndex];
+    sauces = lineItem.optionGroups()[saucesIndex];
     lineItem.addOption(sauces, sauces.option_items[0]);
 
     expect(lineItem.operationMaps[saucesIndex].currentlySelectedCount).to.equal(1);
@@ -119,13 +112,12 @@ describe('LineItem', () => {
   });
 
   it('will calculate the price effect on the optionItem level', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     const groupIndex = 1;
 
     /* This group doesn't include any free options */
     expect(lineItem.operationMaps[groupIndex].extraOptionsWillIncurCost).to.equal(true);
 
-    const sides = lineItem.optionGroups()[groupIndex];
+    sides = lineItem.optionGroups()[groupIndex];
     let newOption = sides.option_items[0];
     lineItem.addOption(sides, newOption);
 
@@ -154,13 +146,12 @@ describe('LineItem', () => {
   });
 
   it('will calculate the price effect on the optionGroup level', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
     const groupIndex = 1;
 
     /* This group doesn't include any free options */
     expect(lineItem.operationMaps[groupIndex].extraOptionsWillIncurCost).to.equal(true);
 
-    const sides = lineItem.optionGroups()[groupIndex];
+    sides = lineItem.optionGroups()[groupIndex];
     let newOption = sides.option_items[0];
 
     lineItem.addOption(sides, newOption);
@@ -170,5 +161,18 @@ describe('LineItem', () => {
     newOption = sides.option_items[1];
     lineItem.addOption(sides, newOption);
     expect(lineItem.operationMaps[groupIndex].totalEffectOnPrice).to.equal('0.92');
+  });
+
+  it('will calculate the price effect for multiple of the same optionItem', () => {
+    const item = sauces.option_items[0];
+    lineItem.addOption(sauces, item);
+    lineItem.addOption(sauces, item);
+    lineItem.addOption(sauces, item);
+
+    const sauceGroup = lineItem.operationMaps[2];
+    const itemsToBeChargedFor = sauceGroup.currentlySelectedCount - sauceGroup.optionGroupData.included_options;
+    const expectedPrice = itemsToBeChargedFor * parseFloat(item.price);
+
+    expect(parseFloat(sauceGroup.totalEffectOnPrice)).to.equal(expectedPrice);
   });
 });
