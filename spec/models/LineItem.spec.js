@@ -165,14 +165,16 @@ describe('models/lineItem', () => {
 
   it('will calculate the price effect for multiple of the same optionItem', () => {
     const item = sauces.option_items[0];
+    const item2 = sauces.option_items[1];
     lineItem.addOption(sauces, item);
     lineItem.addOption(sauces, item);
     lineItem.addOption(sauces, item);
+    lineItem.addOption(sauces, item2);
 
     const sauceGroup = lineItem.operationMaps[2];
     const itemsToBeChargedFor = sauceGroup.currentlySelectedCount - sauceGroup.optionGroupData.included_options;
     const expectedPrice = itemsToBeChargedFor * parseFloat(item.price);
 
-    expect(parseFloat(sauceGroup.totalEffectOnPrice)).to.equal(expectedPrice);
+    expect(parseFloat(sauceGroup.totalEffectOnPrice).toFixed(2)).to.equal(expectedPrice.toFixed(2));
   });
 });
