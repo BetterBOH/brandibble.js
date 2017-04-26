@@ -1,6 +1,6 @@
 /* global Brandibble expect it describe */
 /* eslint no-new:1 */
-import productJSON from './../product.stub';
+import productJSON from '../stubs/product.stub';
 
 describe('LineItem', () => {
   it('can add option and increase quantity of option items', () => {
@@ -50,6 +50,15 @@ describe('LineItem', () => {
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
     expect(lineItem.format()).to.contain.all.keys(['id', 'made_for', 'instructions', 'quantity', 'option_groups']);
+  });
+
+  it('can format itself for favorites', () => {
+    const lineItem = new Brandibble.LineItem(productJSON, 1);
+    const bases = lineItem.optionGroups()[0];
+    const sides = lineItem.optionGroups()[1];
+    lineItem.addOption(bases, bases.option_items[0]);
+    lineItem.addOption(sides, sides.option_items[0]);
+    expect(lineItem.formatForFavorites()).to.contain.all.keys(['id', 'made_for', 'instructions', 'option_groups']);
   });
 
   it('it can not violate an option rule', () => {

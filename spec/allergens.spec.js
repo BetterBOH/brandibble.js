@@ -21,6 +21,7 @@ describe('Allergens', () => {
         password,
       }).then(() => {
         return Brandibble.allergens.all().then(({ data }) => {
+          debugger;
           allergens = data;
         });
       });
