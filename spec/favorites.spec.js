@@ -1,6 +1,7 @@
 /* global Brandibble expect it describe before */
+/* eslint no-shadow: 1 */
 import productJSON from './stubs/product.stub';
-import { shouldSucceed, TestingUser } from './helpers';
+import { TestingUser } from './helpers';
 
 describe('Favorites', () => {
   let lineItem;

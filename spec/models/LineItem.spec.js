@@ -55,9 +55,6 @@ describe('models/lineItem', () => {
   });
 
   it('can format itself for favorites', () => {
-    const lineItem = new Brandibble.LineItem(productJSON, 1);
-    const bases = lineItem.optionGroups()[0];
-    const sides = lineItem.optionGroups()[1];
     lineItem.addOption(bases, bases.option_items[0]);
     lineItem.addOption(sides, sides.option_items[0]);
     expect(lineItem.formatForFavorites()).to.contain.all.keys(['id', 'made_for', 'instructions', 'option_groups']);
