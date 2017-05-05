@@ -74,7 +74,7 @@ describe('models/order', () => {
   it('returns errors for invalid customers', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.setCustomer({ invalidKey: 'hi' }).catch((errors) => {
-      expect(errors).to.have.keys(['first_name', 'last_name', 'password', 'email']);
+      expect(errors).to.have.keys(['first_name', 'last_name', 'email']);
     });
   });
 
