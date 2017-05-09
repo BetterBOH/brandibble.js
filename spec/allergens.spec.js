@@ -20,8 +20,12 @@ describe('Allergens', () => {
         email,
         password,
       }).then(() => {
-        return Brandibble.allergens.all().then(({ data }) => {
-          allergens = data;
+        return Brandibble.customers.current().then((customer) => {
+          const customerAllergens = customer.data.allergens;
+
+          return Brandibble.allergens.all().then(({ data }) => {
+            allergens = data.filter(i => customerAllergens.indexOf(i.name) < 0);
+          });
         });
       });
     });
