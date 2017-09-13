@@ -22,18 +22,18 @@ describe('models/order', () => {
 
   it('can flag a wantsFutureOrder', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    newOrder.setRequestedAt("2017-06-21T16:09:49Z", true);
+    newOrder.setRequestedAt('2017-06-21T16:09:49Z', true);
     expect(newOrder.wantsFutureOrder).to.be.true;
   });
 
   it('will throw if wantsFutureOrder is not a bool', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    expect(() => newOrder.setRequestedAt("2017-06-21T16:09:49Z", 'true')).to.throw;
+    expect(() => newOrder.setRequestedAt('2017-06-21T16:09:49Z', 'true')).to.throw;
   });
 
   it('will throw when setting wantsFutureOrder and asap', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
-    expect(() => newOrder.setRequestedAt("asap", true)).to.throw;
+    expect(() => newOrder.setRequestedAt('asap', true)).to.throw;
   });
 
   it('can add a LineItem', () => {

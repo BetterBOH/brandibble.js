@@ -72,7 +72,7 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   const product = data.menu[0].children[0].items[0];
   const lineItem = await newOrder.addLineItem(product, 1);
 
-  expect(lineItem.product.name).to.equal('Charred Chicken');
+  expect(lineItem.product.name).to.equal('Charred Chicken Marketbowl');
   expect(lineItem.isValid()).to.equal(false);
   expect(newOrder.cart.isValid()).to.equal(false);
 
@@ -82,6 +82,7 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   await Promise.all([
     newOrder.addOptionToLineItem(lineItem, bases, bases.option_items[0]),
     newOrder.addOptionToLineItem(lineItem, sides, sides.option_items[0]),
+    newOrder.addOptionToLineItem(lineItem, sides, sides.option_items[1]),
   ]);
 
   expect(lineItem.isValid()).to.equal(true);

@@ -91,7 +91,7 @@ describe('Customers', () => {
   });
 
   it('can trigger a customers reset password flow', async () => {
-    const response = await Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' }).catch(console.log);
+    const response = await Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' });
     expect(response).to.be.true;
   });
 
@@ -173,9 +173,6 @@ describe('Customers', () => {
     const data = await Brandibble.customers.orders(customer_id);
     const orders = await shouldSucceed(data);
     expect(orders).to.be.array;
-    expect(orders[0]).to.have.property('address');
-    expect(orders[0]).to.have.property('items');
-    expect(orders[0]).to.have.property('orders_id');
   });
 
 

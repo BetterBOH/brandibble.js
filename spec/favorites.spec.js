@@ -3,7 +3,7 @@
 import productJSON from './stubs/product.stub';
 import menuStub from './stubs/menu.stub';
 import { validFavoriteForOrder, invalidFavoriteForOrder } from './stubs/favorite.stub';
-import { TestingUser } from './helpers';
+import { shouldSucceed, TestingUser } from './helpers';
 
 describe('Favorites', () => {
   let lineItem;
@@ -15,11 +15,21 @@ describe('Favorites', () => {
       email,
       password,
     }).then(() => {
-      lineItem = new Brandibble.LineItem(productJSON, 1);
-      const bases = lineItem.optionGroups()[0];
-      const sides = lineItem.optionGroups()[1];
-      lineItem.addOption(bases, bases.option_items[0]);
-      lineItem.addOption(sides, sides.option_items[0]);
+      return Brandibble.locations.index().then((res) => {
+        let data = shouldSucceed(res);
+        return Brandibble.menus.build(data[0].location_id, 'pickup').then((response) => {
+          let { menu } = shouldSucceed(response);
+          expect(menu).to.be.an('array');
+          let product = menu[0].children[0].items[0];
+          expect(product.name).to.eq('Charred Chicken Marketbowl');
+          lineItem = new Brandibble.LineItem(productJSON, 1);
+          const bases = lineItem.optionGroups()[0];
+          const sides = lineItem.optionGroups()[1];
+          lineItem.addOption(bases, bases.option_items[0]);
+          lineItem.addOption(sides, sides.option_items[0]);
+          lineItem.addOption(sides, sides.option_items[1]);
+        });
+      });
     });
   });
 

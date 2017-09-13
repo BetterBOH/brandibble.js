@@ -11,7 +11,7 @@ export default {
   large_image_url: '//s3.amazonaws.com/betterboh/u/img/prod/6/1461592134_ChickenLemon_or_Charred.jpg',
   length: null,
   menu_position: 2,
-  name: 'Charred Chicken',
+  name: 'Charred Chicken Marketbowl',
   nutritional_info: {
     calories: 290,
     cholesterol: 167,

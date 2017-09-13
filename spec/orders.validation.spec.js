@@ -51,4 +51,24 @@ describe('Orders Validate', () => {
 
     shouldSucceed(response);
   });
+
+  it('can validate a pickup order without a customer address', async () => {
+    const { email, password } = TestingUser;
+
+    let response = await Brandibble.customers.authenticate({ email, password });
+    const customer = shouldSucceed(response);
+
+    // TODO: We should use stored cards in this test eventually
+    const card = {
+      cc_expiration: '0130',
+      cc_number: Brandibble.TestCreditCards.visa[0].number,
+      cc_zip: 12345,
+      cc_cvv: 123,
+    };
+
+    const newOrder = await configureTestingOrder(Brandibble, customer, null, card);
+    response = await Brandibble.orders.validate(newOrder);
+
+    shouldSucceed(response);
+  });
 });

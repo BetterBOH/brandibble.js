@@ -1,7 +1,7 @@
 /* global window before */
 import localforage from 'localforage';
 import Brandibble from '..';
-import { shouldSucceed, TestingUser, TestingAddress, UnsecureApiKey } from './helpers';
+import { shouldSucceed, TestingUser, OrdersTestingUser, TestingAddress, UnsecureApiKey } from './helpers';
 
 const { email, password } = TestingUser;
 
@@ -17,6 +17,10 @@ function ensureCustomerResourcesExist() {
   }).catch(error => console.log(error));
 }
 
+function ensureOrdersTestingUserExists() {
+  return window.Brandibble.customers.create(OrdersTestingUser);
+}
+
 before(async () => {
   // Setup a Brandibble Ref, and add it to the Window
   const BrandibbleRef = await new Brandibble({
@@ -29,6 +33,7 @@ before(async () => {
   return BrandibbleRef.setup().then((brandibble) => {
     window.Brandibble = brandibble;
     return brandibble.customers.create(TestingUser)
-      .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist);
-  }).catch(error => console.log(error));
+      .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist)
+      .then(ensureOrdersTestingUserExists, ensureOrdersTestingUserExists)
+  });
 });
