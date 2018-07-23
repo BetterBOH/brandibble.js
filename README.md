@@ -170,3 +170,4 @@ There are only three methods that you can do on an Order:
 ### Testing
 - **IMPORTANT:** Set an environment variable called `BRANDIBBLE_API_KEY` with your Brandibble API key before running tests.
 - `npm test`
+

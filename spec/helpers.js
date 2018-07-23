@@ -1,4 +1,5 @@
 /* global expect */
+
 import find from 'lodash.find';
 import includes from 'lodash.includes';
 import { PaymentTypes } from '../lib/utils';

@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
   entry: [
     'whatwg-fetch',
-    './lib/brandibble',
+    './src/brandibble',
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -17,7 +17,7 @@ module.exports = {
       path.resolve(__dirname),
     ],
     extensions: ['.js'],
-    alias: { brandibble: 'lib' },
+    alias: { brandibble: 'src' },
   },
   module: {
     rules: [
@@ -25,7 +25,7 @@ module.exports = {
         test: /\.js/,
         exclude: /node_modules/,
         include: [
-          path.join(__dirname, 'lib'),
+          path.join(__dirname, 'src'),
           path.join(__dirname, 'spec'),
         ],
         use: ['babel-loader', 'eslint-loader'],

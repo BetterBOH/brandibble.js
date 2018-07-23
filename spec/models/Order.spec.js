@@ -4,7 +4,7 @@ import locationJSON from '../stubs/location.stub';
 import menuStub from '../stubs/menu.stub';
 import { validFavoriteForOrder } from '../stubs/favorite.stub';
 import { TestingAddress } from '../helpers';
-import { PaymentTypes } from '../../lib/utils';
+import { PaymentTypes } from '../../src/utils';
 
 describe('models/order', () => {
   it('wont allow orders to share the misc object memory allocation', () => {
