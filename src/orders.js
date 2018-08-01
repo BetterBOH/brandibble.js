@@ -48,15 +48,16 @@ export default class Orders {
     return lineItem;
   }
 
-  /* The only attrs testChanges accepts are location_id, service_type & requested_at  */
-  validateCart(orderObj, testChanges = {}) {
+  /* The only attrs `data` accepts are location_id, service_type & requested_at  */
+  validateCart(orderObj, data = {}) {
     const body = orderObj.formatForValidation();
-    Object.assign(body, testChanges);
+    Object.assign(body, data);
     return this.adapter.request('POST', 'cart/validate', body);
   }
 
-  validate(orderObj) {
+  validate(orderObj, data = {}) {
     const body = orderObj.format();
+    Object.assign(body, data);
     return this.adapter.request('POST', 'orders/validate', body);
   }
 
