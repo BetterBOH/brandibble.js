@@ -96,6 +96,11 @@ export default class Order {
     return Promise.reject(result);
   }
 
+  unsetCustomer() {
+    this.customer = null;
+    return this.adapter.persistCurrentOrder(this);
+  }
+
   setPromoCode(promo) {
     this.miscOptions.promo_code = promo;
     return this.adapter.persistCurrentOrder(this);

@@ -152,6 +152,25 @@ describe('models/order', () => {
     });
   });
 
+  it('can unset a customer', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    const customer = {
+      first_name: 'Hugh',
+      last_name: 'Francis',
+      email: 'hugh@hugh.co',
+      password: 'pizzapasta',
+      phone: '5125324352',
+    };
+    return newOrder.setCustomer(customer)
+      .then(() => {
+        expect(newOrder.customer).to.have.keys(['first_name', 'last_name', 'password', 'email', 'phone']);
+        return newOrder.unsetCustomer();
+      })
+      .then(() => {
+        expect(newOrder.customer).to.be.null;
+      });
+  });
+
   it('does not validate when IDs are passed for address', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.setAddress({ customer_address_id: 123 }).then((savedOrder) => {
