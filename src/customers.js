@@ -9,7 +9,9 @@ export default class Customers {
   // STATEFUL METHODS
   authenticate(body) {
     return this.token(body).then((response) => {
-      return this.adapter.persistCustomerToken(response.data.token).then(this.current.bind(this));
+      return this.adapter
+        .persistCustomerToken(response.data.token)
+        .then(this.current.bind(this));
     });
   }
 
@@ -36,7 +38,18 @@ export default class Customers {
   }
 
   currentLevelUpCampaign(campaignId, campaignType) {
-    return this.levelUpCampaign(this.adapter.customerId(), campaignId, campaignType);
+    return this.levelUpCampaign(
+      this.adapter.customerId(),
+      campaignId,
+      campaignType,
+    );
+  }
+
+  /* first_name, last_name, email, password, phone:opt */
+  createAndAuthenticate(body) {
+    return this.create(body).then(() => {
+      return this.authenticate({ email: body.email, password: body.password });
+    });
   }
 
   // STATELESS METHODS
@@ -69,12 +82,19 @@ export default class Customers {
   /* limit, sort, status */
   orders(customerId, params = {}) {
     const query = querystring.stringify(params);
-    return this.adapter.request('GET', `customers/${customerId}/orders?${query}`);
+    return this.adapter.request(
+      'GET',
+      `customers/${customerId}/orders?${query}`,
+    );
   }
 
   /* first_name, last_name, email, password, phone:opt */
   update(body, customerId) {
-    const promise = this.adapter.request('PUT', `customers/${customerId}`, body);
+    const promise = this.adapter.request(
+      'PUT',
+      `customers/${customerId}`,
+      body,
+    );
     this.events.triggerAsync('customers.update', promise);
     return promise;
   }
@@ -86,7 +106,11 @@ export default class Customers {
   }
 
   finishResetPassword(token, body) {
-    const promise = this.adapter.request('POST', `customers/reset/${token}`, body);
+    const promise = this.adapter.request(
+      'POST',
+      `customers/reset/${token}`,
+      body,
+    );
     this.events.triggerAsync('customers.finishResetPassword', promise);
     return promise;
   }
@@ -96,12 +120,18 @@ export default class Customers {
   /* customer_id, code, color, tip_amount, tip_percent, width */
   levelUpQRCode(customerId, params = {}) {
     const query = querystring.stringify(params);
-    return this.adapter.request('GET', `customers/${customerId}/levelup/qr_code?${query}`);
+    return this.adapter.request(
+      'GET',
+      `customers/${customerId}/levelup/qr_code?${query}`,
+    );
   }
 
   /* customer_id */
   levelUpLoyalty(customerId) {
-    return this.adapter.request('GET', `customers/${customerId}/levelup/loyalty`);
+    return this.adapter.request(
+      'GET',
+      `customers/${customerId}/levelup/loyalty`,
+    );
   }
 
   /* update levelup permissions */
@@ -114,12 +144,19 @@ export default class Customers {
   levelUpConnect(customerId, email, password) {
     const data = { email };
     if (password) data.password = password;
-    return this.adapter.request('POST', `customers/${customerId}/levelup`, data);
+    return this.adapter.request(
+      'POST',
+      `customers/${customerId}/levelup`,
+      data,
+    );
   }
 
   /* show levelup campaign */
   levelUpCampaign(customerId, campaignId, campaignType) {
-    return this.adapter.request('GET', `customers/${customerId}/levelup/campaigns/${campaignId}/${campaignType}`);
+    return this.adapter.request(
+      'GET',
+      `customers/${customerId}/levelup/campaigns/${campaignId}/${campaignType}`,
+    );
   }
 
   /* disconnect level up account */
@@ -128,11 +165,18 @@ export default class Customers {
   }
 
   levelUpPaymentMethod(customerId) {
-    return this.adapter.request('GET', `customers/${customerId}/levelup/payment_method`);
+    return this.adapter.request(
+      'GET',
+      `customers/${customerId}/levelup/payment_method`,
+    );
   }
 
   resetLevelUpPassword(body) {
-    const promise = this.adapter.request('POST', 'customers/reset_levelup', body);
+    const promise = this.adapter.request(
+      'POST',
+      'customers/reset_levelup',
+      body,
+    );
     this.events.triggerAsync('customers.resetLevelUpPassword', promise);
     return promise;
   }
