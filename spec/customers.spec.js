@@ -36,6 +36,42 @@ describe('Customers', () => {
     });
   });
 
+  it('can create and authenticate a customer', async () => {
+    const seededEmail = seedEmail();
+    const response = await Brandibble.customers.createAndAuthenticate({
+      first_name: 'Sanctuary',
+      last_name: 'Testing',
+      email: seededEmail,
+      password: 'password',
+    });
+
+    const data = await shouldSucceed(response);
+
+    expect(data).to.have.property('email', seededEmail);
+    // Customer Token is set in local storage
+    expect(Brandibble.adapter.customerToken).to.be.a('string');
+
+    await Brandibble.customers.invalidate();
+    expect(Brandibble.adapter.customerToken).to.not.exist;
+  });
+
+  it('create and authenticate fails with bad inputs', async () => {
+    try {
+      await Brandibble.customers.createAndAuthenticate({
+        first_name: 'Sanctuary',
+        last_name: 'Testing',
+        email: 'nope',
+        password: 'password',
+      });
+    } catch (error) {
+      const errors = shouldError(error);
+
+      expect(errors).to.be.a('array').to.have.lengthOf(2);
+      expect(errors[0]).to.have.property('code', 'customers.create.validation');
+      expect(errors[1]).to.have.property('title', 'Please submit a valid email address.');
+    }
+  });
+
   it('can retrieve a token', () => {
     return Brandibble.customers.token({
       email: 'sanctuary-testing-customer@example.com',

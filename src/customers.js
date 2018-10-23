@@ -39,6 +39,13 @@ export default class Customers {
     return this.levelUpCampaign(this.adapter.customerId(), campaignId, campaignType);
   }
 
+  /* first_name, last_name, email, password, phone:opt */
+  createAndAuthenticate(body) {
+    return this.create(body).then(() => {
+      return this.authenticate({ email: body.email, password: body.password });
+    });
+  }
+
   // STATELESS METHODS
 
   /* first_name, last_name, email, password, phone:opt */
