@@ -143,4 +143,9 @@ export default class Customers {
     this.events.triggerAsync('customers.resetLevelUpPassword', promise);
     return promise;
   }
+
+  /* fetch catering rewards */
+  cateringRewards(customerId) {
+    return this.adapter.request('GET', `customers/${customerId}/loyalty`);
+  }
 }

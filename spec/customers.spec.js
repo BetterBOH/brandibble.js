@@ -211,6 +211,17 @@ describe('Customers', () => {
     });
   });
 
+  it('can check for catering rewards', async function () {
+    const response = await Brandibble.customers.authenticate({
+      email: 'sanctuary-orders-testing-customer@example.com',
+      password: 'password',
+    });
+    const { customer_id } = response.data;
+    const data = await Brandibble.customers.cateringRewards(customer_id);
+    const cateringRewards = await shouldSucceed(data);
+    expect(cateringRewards).to.be.array;
+  });
+
   it('can retrieve a users orders', async function () {
     this.timeout(10000);
     const response = await Brandibble.customers.authenticate({
