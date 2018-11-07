@@ -136,7 +136,7 @@ describe('Customers', () => {
       await Brandibble.customers.finishResetPassword('123141254jlasdfjwqer', {
         password: 'newpassword',
       });
-    } catch(response) {
+    } catch (response) {
       const errors = shouldError(response);
       expect(errors).to.be.a('array');
       expect(errors[0]).to.have.property('code', 'customers.reset.invalid_token');
@@ -249,7 +249,7 @@ describe('Customers', () => {
    * for this to work, and given our test case here isn't setup, we're just testing
    * the failure case for now.
    */
-  it('can retrieve levelup campaign info for a user', async function () {
+  it('can retrieve levelup campaign info for a user', async () => {
     return Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
       password: 'password',
