@@ -51,7 +51,7 @@ describe('Payments', () => {
       shouldSucceed(response);
       return Brandibble.payments.create({
         cc_number: 4788250000121443,
-        cc_expiration: 1018,
+        cc_expiration: 1030,
         cc_cvv: 740,
         cc_zip: 10022,
       }).then((res) => {
@@ -70,7 +70,7 @@ describe('Payments', () => {
       shouldSucceed(response);
       return Brandibble.payments.create({
         cc_number: 478,
-        cc_expiration: 1018,
+        cc_expiration: 1030,
         cc_cvv: 740,
         cc_zip: 10022,
       }).catch((res) => {

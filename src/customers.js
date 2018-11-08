@@ -144,8 +144,7 @@ export default class Customers {
     return promise;
   }
 
-  /* fetch catering rewards */
-  cateringRewards(customerId) {
+  loyalties(customerId) {
     return this.adapter.request('GET', `customers/${customerId}/loyalty`);
   }
 }

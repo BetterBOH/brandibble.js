@@ -36,7 +36,7 @@ describe('Customers', () => {
     });
   });
 
-  it('can create and authenticate a customer', async () => {
+  it('can create and authenticate a customer', async function() {
     const seededEmail = seedEmail();
     const response = await Brandibble.customers.createAndAuthenticate({
       first_name: 'Sanctuary',
@@ -55,7 +55,7 @@ describe('Customers', () => {
     expect(Brandibble.adapter.customerToken).to.not.exist;
   });
 
-  it('create and authenticate fails with bad inputs', async () => {
+  it('create and authenticate fails with bad inputs', async function() {
     try {
       await Brandibble.customers.createAndAuthenticate({
         first_name: 'Sanctuary',
@@ -93,7 +93,7 @@ describe('Customers', () => {
     });
   });
 
-  it('can authenticate the client with a current customer', async () => {
+  it('can authenticate the client with a current customer', async function() {
     const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
       password: 'password',
@@ -108,7 +108,7 @@ describe('Customers', () => {
     expect(Brandibble.adapter.customerToken).to.not.exist;
   });
 
-  it('can validate a customers metadata', async () => {
+  it('can validate a customers metadata', async function() {
     const response = await Brandibble.customers.validateCustomer({ email: 'sanctuary-testing-customer@example.com' });
     const data = await shouldSucceed(response);
     expect(data).to.have.property('is_brandibble_active');
@@ -126,17 +126,17 @@ describe('Customers', () => {
     });
   });
 
-  it('can trigger a customers reset password flow', async () => {
+  it('can trigger a customers reset password flow', async function() {
     const response = await Brandibble.customers.resetPassword({ email: 'sanctuary-testing-customer@example.com' });
     expect(response).to.be.true;
   });
 
-  it('can attempt to complete a customer\'s reset password flow', async () => {
+  it('can attempt to complete a customer\'s reset password flow', async function() {
     try {
       await Brandibble.customers.finishResetPassword('123141254jlasdfjwqer', {
         password: 'newpassword',
       });
-    } catch(response) {
+    } catch (response) {
       const errors = shouldError(response);
       expect(errors).to.be.a('array');
       expect(errors[0]).to.have.property('code', 'customers.reset.invalid_token');
@@ -211,18 +211,18 @@ describe('Customers', () => {
     });
   });
 
-  it('can check for catering rewards', async function () {
+  it('can check for customer loyalties', async function() {
     const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-orders-testing-customer@example.com',
       password: 'password',
     });
     const { customer_id } = response.data;
-    const data = await Brandibble.customers.cateringRewards(customer_id);
-    const cateringRewards = await shouldSucceed(data);
-    expect(cateringRewards).to.be.array;
+    const data = await Brandibble.customers.loyalties(customer_id);
+    const loyalties = await shouldSucceed(data);
+    expect(loyalties).to.be.array;
   });
 
-  it('can retrieve a users orders', async function () {
+  it('can retrieve a users orders', async function() {
     this.timeout(10000);
     const response = await Brandibble.customers.authenticate({
       email: 'sanctuary-orders-testing-customer@example.com',
@@ -235,7 +235,7 @@ describe('Customers', () => {
   });
 
 
-  it('can retrieve a users upcoming orders', async function () {
+  it('can retrieve a users upcoming orders', async function() {
     this.timeout(10000);
     const { email, password } = OrdersTestingUser;
     const response = await Brandibble.customers.authenticate({ email, password });
@@ -249,7 +249,7 @@ describe('Customers', () => {
    * for this to work, and given our test case here isn't setup, we're just testing
    * the failure case for now.
    */
-  it('can retrieve levelup campaign info for a user', async function () {
+  it('can retrieve levelup campaign info for a user', async function() {
     return Brandibble.customers.authenticate({
       email: 'sanctuary-testing-customer@example.com',
       password: 'password',
