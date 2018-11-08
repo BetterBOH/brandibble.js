@@ -143,4 +143,8 @@ export default class Customers {
     this.events.triggerAsync('customers.resetLevelUpPassword', promise);
     return promise;
   }
+
+  loyalties(customerId) {
+    return this.adapter.request('GET', `customers/${customerId}/loyalty`);
+  }
 }
