@@ -34,6 +34,7 @@ export default class Order {
     this.serviceType = serviceType;
     /* Ensure each object owns it's miscOptions */
     this.miscOptions = Object.assign({}, miscOptions);
+    this.appliedDiscounts = [];
     this.requestedAt = ASAP_STRING;
     this.paymentType = paymentType;
     /* This is here so that we can internally mark when
@@ -98,6 +99,17 @@ export default class Order {
 
   setPromoCode(promo) {
     this.miscOptions.promo_code = promo;
+    return this.adapter.persistCurrentOrder(this);
+  }
+
+  addAppliedDiscount(newDiscount) {
+    const discountExists = this.appliedDiscounts.find(appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
+    if (!discountExists) this.appliedDiscounts.push(newDiscount);
+    return this.adapter.persistCurrentOrder(this);
+  }
+
+  removeAppliedDiscount(newDiscount) {
+    this.appliedDiscounts = this.appliedDiscounts.filter(appliedDiscount => appliedDiscount.discount_id !== newDiscount.discount_id);
     return this.adapter.persistCurrentOrder(this);
   }
 
@@ -297,6 +309,7 @@ export default class Order {
       notes_for_store,
       promo_code,
       payment_type: this.paymentType,
+      applied_discounts: this.appliedDiscounts
     };
 
     if (this.serviceType === serviceTypes.DELIVERY) {
