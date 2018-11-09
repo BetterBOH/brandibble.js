@@ -1,3 +1,4 @@
+import find from 'lodash.find';
 import validate from 'validate.js';
 import Cart from './cart';
 import LineItem from './lineItem';
@@ -103,7 +104,7 @@ export default class Order {
   }
 
   addAppliedDiscount(newDiscount) {
-    const discountExists = this.appliedDiscounts.find(appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
+    const discountExists = find(this.appliedDiscounts, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
     if (!discountExists) this.appliedDiscounts.push(newDiscount);
     return this.adapter.persistCurrentOrder(this);
   }
