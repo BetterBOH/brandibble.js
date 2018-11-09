@@ -1,4 +1,5 @@
 import find from 'lodash.find';
+import filter from 'lodash.filter';
 import validate from 'validate.js';
 import Cart from './cart';
 import LineItem from './lineItem';
@@ -110,7 +111,7 @@ export default class Order {
   }
 
   removeAppliedDiscount(newDiscount) {
-    this.appliedDiscounts = this.appliedDiscounts.filter(appliedDiscount => appliedDiscount.discount_id !== newDiscount.discount_id);
+    this.appliedDiscounts = filter(this.appliedDiscounts, (appliedDiscount) => appliedDiscount.discount_id !== newDiscount.discount_id);
     return this.adapter.persistCurrentOrder(this);
   }
 
