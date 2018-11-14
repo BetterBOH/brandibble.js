@@ -1,3 +1,5 @@
+import find from 'lodash.find';
+import filter from 'lodash.filter';
 import validate from 'validate.js';
 import Cart from './cart';
 import LineItem from './lineItem';
@@ -34,6 +36,7 @@ export default class Order {
     this.serviceType = serviceType;
     /* Ensure each object owns it's miscOptions */
     this.miscOptions = Object.assign({}, miscOptions);
+    this.discountsApplied = [];
     this.requestedAt = ASAP_STRING;
     this.paymentType = paymentType;
     /* This is here so that we can internally mark when
@@ -98,6 +101,17 @@ export default class Order {
 
   setPromoCode(promo) {
     this.miscOptions.promo_code = promo;
+    return this.adapter.persistCurrentOrder(this);
+  }
+
+  addAppliedDiscount(newDiscount) {
+    const discountExists = find(this.discountsApplied, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
+    if (!discountExists) this.discountsApplied.push({ discount_id: newDiscount.discount_id });
+    return this.adapter.persistCurrentOrder(this);
+  }
+
+  removeAppliedDiscount(newDiscount) {
+    this.discountsApplied = filter(this.discountsApplied, (appliedDiscount) => appliedDiscount.discount_id !== newDiscount.discount_id);
     return this.adapter.persistCurrentOrder(this);
   }
 
@@ -232,6 +246,7 @@ export default class Order {
       service_type: this.serviceType,
       requested_at: this.requestedAt,
       promo_code: this.promo_code,
+      discounts_applied: this.discountsApplied,
       cart: this.cart.format(),
     };
   }
@@ -297,6 +312,7 @@ export default class Order {
       notes_for_store,
       promo_code,
       payment_type: this.paymentType,
+      discounts_applied: this.discountsApplied
     };
 
     if (this.serviceType === serviceTypes.DELIVERY) {
