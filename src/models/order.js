@@ -36,7 +36,6 @@ export default class Order {
     this.serviceType = serviceType;
     /* Ensure each object owns it's miscOptions */
     this.miscOptions = Object.assign({}, miscOptions);
-    // this.discounts_optional = [];
     this.discountsApplied = [];
     this.requestedAt = ASAP_STRING;
     this.paymentType = paymentType;
