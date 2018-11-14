@@ -98,7 +98,7 @@ describe('models/order', () => {
   it('adds a discount', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.addAppliedDiscount({ discount_id: 123 }).then((savedOrder) => {
-      expect(savedOrder.appliedDiscounts).to.have.lengthOf(1);
+      expect(savedOrder.discountsApplied).to.have.lengthOf(1);
     });
   });
 
@@ -110,7 +110,7 @@ describe('models/order', () => {
       newOrder.addAppliedDiscount({ discount_id: 124 }),
     ])
     .then((savedOrders) => {
-      expect(savedOrders[2].appliedDiscounts).to.have.lengthOf(2);
+      expect(savedOrders[2].discountsApplied).to.have.lengthOf(2);
     });
   });
 
@@ -118,10 +118,10 @@ describe('models/order', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.addAppliedDiscount({ discount_id: 123 })
     .then((savedOrder) => {
-      expect(savedOrder.appliedDiscounts).to.have.lengthOf(1);
+      expect(savedOrder.discountsApplied).to.have.lengthOf(1);
       return newOrder.removeAppliedDiscount({ discount_id: 123 });
     }).then((savedOrder) => {
-      expect(savedOrder.appliedDiscounts).to.be.empty;
+      expect(savedOrder.discountsApplied).to.be.empty;
     });
   });
 

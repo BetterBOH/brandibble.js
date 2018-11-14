@@ -36,7 +36,8 @@ export default class Order {
     this.serviceType = serviceType;
     /* Ensure each object owns it's miscOptions */
     this.miscOptions = Object.assign({}, miscOptions);
-    this.appliedDiscounts = [];
+    // this.discounts_optional = [];
+    this.discountsApplied = [];
     this.requestedAt = ASAP_STRING;
     this.paymentType = paymentType;
     /* This is here so that we can internally mark when
@@ -105,13 +106,13 @@ export default class Order {
   }
 
   addAppliedDiscount(newDiscount) {
-    const discountExists = find(this.appliedDiscounts, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
-    if (!discountExists) this.appliedDiscounts.push(newDiscount);
+    const discountExists = find(this.discountsApplied, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
+    if (!discountExists) this.discountsApplied.push({ discount_id: newDiscount.discount_id });
     return this.adapter.persistCurrentOrder(this);
   }
 
   removeAppliedDiscount(newDiscount) {
-    this.appliedDiscounts = filter(this.appliedDiscounts, (appliedDiscount) => appliedDiscount.discount_id !== newDiscount.discount_id);
+    this.discountsApplied = filter(this.discountsApplied, (appliedDiscount) => appliedDiscount.discount_id !== newDiscount.discount_id);
     return this.adapter.persistCurrentOrder(this);
   }
 
@@ -246,6 +247,7 @@ export default class Order {
       service_type: this.serviceType,
       requested_at: this.requestedAt,
       promo_code: this.promo_code,
+      discounts_applied: this.discountsApplied,
       cart: this.cart.format(),
     };
   }
@@ -311,7 +313,7 @@ export default class Order {
       notes_for_store,
       promo_code,
       payment_type: this.paymentType,
-      applied_discounts: this.appliedDiscounts
+      discounts_applied: this.discountsApplied
     };
 
     if (this.serviceType === serviceTypes.DELIVERY) {
