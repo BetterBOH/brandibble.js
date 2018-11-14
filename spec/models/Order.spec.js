@@ -95,6 +95,36 @@ describe('models/order', () => {
     });
   });
 
+  it('adds a discount', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.addAppliedDiscount({ discount_id: 123 }).then((savedOrder) => {
+      expect(savedOrder.discountsApplied).to.have.lengthOf(1);
+    });
+  });
+
+  it('does not add a discount if it already exists', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return Promise.all([
+      newOrder.addAppliedDiscount({ discount_id: 123 }),
+      newOrder.addAppliedDiscount({ discount_id: 124 }),
+      newOrder.addAppliedDiscount({ discount_id: 124 }),
+    ])
+    .then((savedOrders) => {
+      expect(savedOrders[2].discountsApplied).to.have.lengthOf(2);
+    });
+  });
+
+  it('removes a discount', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    return newOrder.addAppliedDiscount({ discount_id: 123 })
+    .then((savedOrder) => {
+      expect(savedOrder.discountsApplied).to.have.lengthOf(1);
+      return newOrder.removeAppliedDiscount({ discount_id: 123 });
+    }).then((savedOrder) => {
+      expect(savedOrder.discountsApplied).to.be.empty;
+    });
+  });
+
   it('can set location id', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.setLocation(19).then((savedOrder) => {

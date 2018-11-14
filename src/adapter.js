@@ -121,6 +121,7 @@ export default class Adapter {
         address,
         creditCard,
         wantsFutureOrder,
+        discountsApplied
       } = CircularJSON.parse(serializedOrder);
 
       const order = new Order(this, locationId, serviceType, paymentType, miscOptions);
@@ -131,6 +132,7 @@ export default class Adapter {
       if (requestedAt) { order.requestedAt = requestedAt; }
       if (creditCard) { order.creditCard = creditCard; }
       if (uuid) { order.uuid = uuid; }
+      if (discountsApplied) { order.discountsApplied = discountsApplied; }
       this.currentOrder = order.rehydrateCart(cart);
       return this.currentOrder;
     });
