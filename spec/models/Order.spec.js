@@ -34,6 +34,15 @@ describe('models/order', () => {
     expect(newOrder.wantsFutureOrder).to.be.true;
   });
 
+  it('can set the serviceType of an order', () => {
+    const firstOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
+    firstOrder.setServiceType('delivery');
+    const secondOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    secondOrder.setServiceType('pickup');
+    expect(firstOrder.serviceType).to.equal('delivery');
+    expect(secondOrder.serviceType).to.equal('pickup');
+  });
+
   it('will throw if wantsFutureOrder is not a bool', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     expect(() => newOrder.setRequestedAt('2017-06-21T16:09:49Z', 'true')).to.throw;

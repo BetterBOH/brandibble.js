@@ -104,6 +104,11 @@ export default class Order {
     return this.adapter.persistCurrentOrder(this);
   }
 
+  setServiceType(serviceType) {
+    this.serviceType = serviceType;
+    return this.adapter.persistCurrentOrder(this);
+  }
+
   addAppliedDiscount(newDiscount) {
     const discountExists = find(this.discountsApplied, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
     if (!discountExists) this.discountsApplied.push({ discount_id: newDiscount.discount_id });
