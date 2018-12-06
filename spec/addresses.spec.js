@@ -97,4 +97,33 @@ describe('Addresses', () => {
       });
     });
   });
+
+  it('can set a default address', () => {
+    const { email, password } = TestingUser;
+    return Brandibble.customers.authenticate({
+      email,
+      password,
+    }).then((response) => {
+      shouldSucceed(response);
+      return Brandibble.addresses.create({
+        street_address: '69 Street St',
+        unit: '1 FL',
+        city: 'New York',
+        state_code: 'NY',
+        zip_code: 10013,
+        latitude: 40.755912,
+        longitude: -73.9709333,
+        company: 'Hello Computer',
+        contact_name: 'Steve Francis',
+        contact_phone: '5512213610',
+      }).then((res) => {
+        const addressToMakeDefault = res.data[0];
+        const { customer_address_id } = addressToMakeDefault;
+        return Brandibble.addresses.setDefault(customer_address_id).then((r) => {
+          const updatedAddress = r.data[0];
+          expect(updatedAddress.is_default).to.be.true;
+        });
+      });
+    });
+  });
 });
