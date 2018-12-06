@@ -119,8 +119,8 @@ describe('Addresses', () => {
       }).then((res) => {
         const addressToMakeDefault = res.data[0];
         const { customer_address_id } = addressToMakeDefault;
-        return Brandibble.addresses.setDefault(customer_address_id).then((r) => {
-          const updatedAddress = r.data[0];
+        return Brandibble.addresses.setDefault(customer_address_id).then((res) => {
+          const updatedAddress = res.data[0];
           expect(updatedAddress.is_default).to.be.true;
         });
       });
