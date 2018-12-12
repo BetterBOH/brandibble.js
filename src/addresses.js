@@ -14,4 +14,8 @@ export default class Addresses {
   delete(customerAddressId) {
     return this.adapter.request('DELETE', `customers/${this.adapter.customerId()}/addresses/${customerAddressId}`);
   }
+
+  setDefault(customerAddressId) {
+    return this.adapter.request('PUT', `customers/${this.adapter.customerId()}/addresses/${customerAddressId}`, { is_default: true });
+  }
 }
