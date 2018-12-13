@@ -1,4 +1,5 @@
-import { queryStringBuilder } from './utils';
+import validate from 'validate.js';
+import { queryStringBuilder, ISO8601_PATTERN } from './utils';
 
 export default class Locations {
   constructor(adapter) {
@@ -16,13 +17,21 @@ export default class Locations {
   }
 
   show(locationId, lat, lng, serviceType, requestedAt) {
+    const isISOString = validate(
+      { timestamp: requestedAt },
+      { timestamp: { format: ISO8601_PATTERN } },
+    );
+    const requested_at = isISOString
+      ? `${requestedAt.toISOString().split('.')[0]}Z`
+      : requestedAt;
+
     const queryStringBase = `locations/${locationId}`;
     const queryParamObject = Object.assign(
       {},
       !!lat && { latitude: lat },
       !!lng && { longitude: lng },
       !!serviceType && { service_type: serviceType },
-      !!requestedAt && { requested_at: requestedAt },
+      !!requested_at && { requested_at },
     );
 
     if (Object.keys(queryParamObject).length) {
