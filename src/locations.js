@@ -19,10 +19,10 @@ export default class Locations {
     const queryStringBase = `locations/${locationId}`;
     const queryParamObject = Object.assign(
       {},
-      lat && { latitude: lat },
-      lng && { longitude: lng },
-      serviceType && { service_type: serviceType },
-      requestedAt && { requested_at: requestedAt },
+      !!lat && { latitude: lat },
+      !!lng && { longitude: lng },
+      !!serviceType && { service_type: serviceType },
+      !!requestedAt && { requested_at: requestedAt },
     );
 
     if (Object.keys(queryParamObject).length) {
