@@ -21,7 +21,7 @@ export default class Locations {
       { timestamp: requestedAt },
       { timestamp: { format: ISO8601_PATTERN } },
     );
-    const requested_at = isISOString
+    const formattedRequestedAt = isISOString
       ? `${requestedAt.toISOString().split('.')[0]}Z`
       : requestedAt;
 
@@ -31,7 +31,7 @@ export default class Locations {
       !!lat && { latitude: lat },
       !!lng && { longitude: lng },
       !!serviceType && { service_type: serviceType },
-      !!requested_at && { requested_at },
+      !!formattedRequestedAt && { requested_at: formattedRequestedAt },
     );
 
     if (Object.keys(queryParamObject).length) {
