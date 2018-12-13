@@ -48,6 +48,62 @@ describe('Locations', () => {
     });
   });
 
+  it('can show a specific location if passed serviceType', () => {
+    const locationId = 19;
+    const serviceType = 'pickup';
+
+    return Brandibble.locations
+      .show(locationId, null, null, serviceType)
+      .then((response) => {
+        const data = shouldSucceed(response);
+        expect(data).to.be.an('object');
+      });
+  });
+
+  it('can show a specific location if passed a valid requestedAt', () => {
+    const locationId = 19;
+    const requestedAt = `${new Date().toISOString().split('.')[0]}Z`;
+
+    return Brandibble.locations
+      .show(locationId, null, null, null, requestedAt)
+      .then((response) => {
+        const data = shouldSucceed(response);
+        expect(data).to.be.an('object');
+      });
+  });
+
+  it('can show a specific location if passed a valid requestedAt in the future', () => {
+    const locationId = 19;
+    const today = new Date();
+    const tomorrow = new Date().setDate(today.getDate() + 1);
+    const futureRequestedAt = `${
+      new Date(tomorrow).toISOString().split('.')[0]
+    }Z`;
+
+    return Brandibble.locations
+      .show(locationId, null, null, null, futureRequestedAt)
+      .then((response) => {
+        const data = shouldSucceed(response);
+        expect(data).to.be.an('object');
+      });
+  });
+
+  it('can show a specific location if passed a valid requestedAt in the future and valid serviceType', () => {
+    const locationId = 19;
+    const serviceType = 'pickup';
+    const today = new Date();
+    const tomorrow = new Date().setDate(today.getDate() + 1);
+    const futureRequestedAt = `${
+      new Date(tomorrow).toISOString().split('.')[0]
+    }Z`;
+
+    return Brandibble.locations
+      .show(locationId, null, null, serviceType, futureRequestedAt)
+      .then((response) => {
+        const data = shouldSucceed(response);
+        expect(data).to.be.an('object');
+      });
+  });
 
   it('can show all locations if passed valid lat and lng', () => {
     return Brandibble.locations.index(LAT_LNG).then((response) => {
@@ -62,7 +118,6 @@ describe('Locations', () => {
       expect(data).to.be.a('array');
     });
   });
-
 
   it('returns errors if passed invalid param', () => {
     const locationId = '6hg';
