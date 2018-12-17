@@ -9,7 +9,10 @@ describe('Brandibble', () => {
     expect(Brandibble).to.have.property('adapter');
     const adapter = Brandibble.adapter;
     expect(adapter).to.have.property('apiKey', UnsecureApiKey);
-    expect(adapter).to.have.property('apiBase', 'https://staging.brandibble.co/api/v1/brands/6/');
+    expect(adapter).to.have.property(
+      'apiBase',
+      'https://staging.brandibble.co/api/v1/brands/6/',
+    );
   });
 
   describe('sendSupportTicket', () => {
