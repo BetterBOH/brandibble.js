@@ -4,21 +4,27 @@ import polyfill from 'es6-promise';
 import validate from 'validate.js';
 
 function dasherize(str) {
-  return str.replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
+  return str
+    .replace(/([A-Z])/g, '-$1')
+    .replace(/[-_\s]+/g, '-')
+    .toLowerCase();
 }
 
 export function queryStringBuilder(queryObject = {}) {
-  return (Object.keys(queryObject)
+  return Object.keys(queryObject)
     .map((k) => {
       /* Encode dates to Brandibble's almost ISO8601 Format */
       if (queryObject[k] instanceof Date) {
-        const branddibleDateFormat = `${queryObject[k].toISOString().split('.')[0]}Z`;
-        return `${encodeURIComponent(k)}=${encodeURIComponent(branddibleDateFormat)}`;
+        const branddibleDateFormat = `${
+          queryObject[k].toISOString().split('.')[0]
+        }Z`;
+        return `${encodeURIComponent(k)}=${encodeURIComponent(
+          branddibleDateFormat,
+        )}`;
       }
       return `${encodeURIComponent(k)}=${encodeURIComponent(queryObject[k])}`;
     })
-    .join('&')
-  );
+    .join('&');
 }
 
 function pad(number) {
@@ -41,11 +47,15 @@ export function applyPollyfills() {
 
   // Is Array for Validate.js
   validate.validators.isArray = function (value) {
-    if (validate.isArray(value)) { return; }
+    if (validate.isArray(value)) {
+      return;
+    }
     return 'must be an array';
   };
 
-  if (typeof Promise === 'undefined') { polyfill(); }
+  if (typeof Promise === 'undefined') {
+    polyfill();
+  }
 
   if (!Date.prototype.toISOString) {
     Date.prototype.toISOString = function () {
@@ -100,9 +110,7 @@ export const TestCreditCards = {
     { response: 'card_expired', number: '5442981111111049' },
     { response: 'insufficient_funds', number: '5442981111111056' },
   ],
-  amex: [
-    { response: 'approval', number: '371449635398431' },
-  ],
+  amex: [{ response: 'approval', number: '371449635398431' }],
   discover: [
     { response: 'approval', number: '6011000995500000' },
     { response: 'refer_call', number: '6011000995511122' },
@@ -118,7 +126,6 @@ export const PaymentTypes = {
   LEVELUP: 'levelup',
 };
 
-
 export const ISO8601_PATTERN = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
 
 // http://stackoverflow.com/posts/8809472/revisions
@@ -130,8 +137,31 @@ export function generateUUID(suffix = '') {
   const uuid = 'xxxxxx'.replace(/[xy]/g, (c) => {
     const r = (d + Math.random() * 16) % 16 | 0;
     d = Math.floor(d / 16);
-    return (c === 'x' ? r : (r&0x3|0x8)).toString(16);
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
   });
   if (suffix && suffix.length) return `${uuid}${dasherize(suffix)}`;
   return uuid;
 }
+
+export const coerceDateToISO8601 = (date) => {
+  if (date instanceof Date) {
+    return `${date.toISOString().split('.')[0]}Z`;
+  }
+
+  // Validate returns undefined
+  // If there are no validation errors
+  // otherwise it returns an object
+  const isInvalidISOString = validate(
+    { timestamp: date },
+    { timestamp: { format: ISO8601_PATTERN } },
+  );
+
+  if (!isInvalidISOString) {
+    return date;
+  }
+
+  throw new Error({
+    message:
+      'A UTC timestamp in ISO 8601 format must be provided, e.g. "2016-06-15T14:36:00Z"',
+  });
+};
