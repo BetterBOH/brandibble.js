@@ -167,7 +167,7 @@ export default class Order {
   setTip(paymentType = PaymentTypes.CASH, tip) {
     switch (paymentType) {
       case PaymentTypes.CASH: {
-        // tips are ignore for cash orders
+        // tips are ignored for cash orders
         this.miscOptions.tip = 0;
         return this.adapter.persistCurrentOrder(this);
       }
