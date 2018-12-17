@@ -15,14 +15,14 @@ describe('Brandibble', () => {
     );
   });
 
-  describe('sendSupportTicket', () => {
-    it('can create support ticket', () => {
-      return Brandibble.sendSupportTicket({
-        subject: 'help!',
-        body: 'i need avocado!',
-      }).then(response => expect(response).to.exist);
-    });
-  });
+  // describe('sendSupportTicket', () => {
+  //   it('can create support ticket', () => {
+  //     return Brandibble.sendSupportTicket({
+  //       subject: 'help!',
+  //       body: 'i need avocado!',
+  //     }).then(response => expect(response).to.exist);
+  //   });
+  // });
 
   describe('reset', () => {
     it('flushes the adapter and re-initializes stateful properties', () => {

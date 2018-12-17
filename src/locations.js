@@ -1,5 +1,4 @@
-import validate from 'validate.js';
-import { queryStringBuilder, ISO8601_PATTERN } from './utils';
+import { queryStringBuilder, coerceDateToISO8601 } from './utils';
 
 export default class Locations {
   constructor(adapter) {
@@ -17,13 +16,11 @@ export default class Locations {
   }
 
   show(locationId, lat, lng, serviceType, requestedAt) {
-    const isISOString = validate(
-      { timestamp: requestedAt },
-      { timestamp: { format: ISO8601_PATTERN } },
-    );
-    const formattedRequestedAt = isISOString
-      ? `${requestedAt.toISOString().split('.')[0]}Z`
-      : requestedAt;
+    let formattedRequestedAt;
+
+    if (requestedAt) {
+      formattedRequestedAt = coerceDateToISO8601(requestedAt);
+    }
 
     const queryStringBase = `locations/${locationId}`;
     const queryParamObject = Object.assign(
