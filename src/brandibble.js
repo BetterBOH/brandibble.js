@@ -13,7 +13,7 @@ import Images from './images';
 
 import Order from './models/order';
 import LineItem from './models/lineItem';
-
+import Constants from './constants';
 import { applyPollyfills, TestCreditCards } from './utils';
 
 applyPollyfills();
@@ -26,12 +26,7 @@ class Storage {
   static clear() { return Promise.resolve(); }
 }
 
-export const Constants = {
-  ServiceTypes: {
-    DELIVERY: 'delivery',
-    PICKUP: 'pickup',
-  }
-};
+export { Constants };
 
 export default class Brandibble {
   constructor({ apiKey, brandId, apiEndpoint = null, apiVersion = null, origin = null, storage = null, requestTimeout = null }) {
