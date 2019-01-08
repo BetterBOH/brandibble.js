@@ -63,7 +63,7 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   expect(data).to.be.a('array');
 
   const serviceType = 'pickup';
-  const location = data.find(location => location.name === TESTING_ORDER_LOCATION_NAME);
+  const location = find(data, location => location.name === TESTING_ORDER_LOCATION_NAME);
   expect(location.name).to.equal(TESTING_ORDER_LOCATION_NAME);
 
   response = await Brandibble.menus.build(location.location_id, serviceType);
