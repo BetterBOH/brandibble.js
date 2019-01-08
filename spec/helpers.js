@@ -3,6 +3,7 @@
 import find from 'lodash.find';
 import includes from 'lodash.includes';
 import { PaymentTypes } from '../src/utils';
+const TESTING_ORDER_LOCATION_NAME = 'Madison Park';
 
 export const TestingUser = {
   first_name: 'Sanctuary',
@@ -62,8 +63,8 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   expect(data).to.be.a('array');
 
   const serviceType = 'pickup';
-  const location = data[0];
-  expect(location.name).to.equal('Madison Park');
+  const location = data.find(location => location.name === TESTING_ORDER_LOCATION_NAME);
+  expect(location.name).to.equal(TESTING_ORDER_LOCATION_NAME);
 
   response = await Brandibble.menus.build(location.location_id, serviceType);
   data = shouldSucceed(response);
