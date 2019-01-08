@@ -26,6 +26,13 @@ class Storage {
   static clear() { return Promise.resolve(); }
 }
 
+export const Constants = {
+  ServiceTypes: {
+    DELIVERY: 'delivery',
+    PICKUP: 'pickup',
+  }
+};
+
 export default class Brandibble {
   constructor({ apiKey, brandId, apiEndpoint = null, apiVersion = null, origin = null, storage = null, requestTimeout = null }) {
     if (!apiKey) { throw new Error('Brandibble.js: Please pass apiKey to the constructor options.'); }
