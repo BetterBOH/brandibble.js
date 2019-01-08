@@ -7,7 +7,7 @@
 An API wrapper for communicating with the Brandibble API in the browser.  Currently not compatible
 with Node.JS environments (but could easily, we'd just need two build targets, and an isomorphic
 fetch library).
-
+#test 
 ### Usage
 
 ```js
