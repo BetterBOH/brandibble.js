@@ -172,7 +172,7 @@ export default class Order {
         return this.adapter.persistCurrentOrder(this);
       }
       default:
-        this.miscOptions.tip = tip;
+        this.miscOptions.tip = parseFloat(tip);
         return this.adapter.persistCurrentOrder(this);
     }
   }
@@ -339,9 +339,9 @@ export default class Order {
 
     switch (payload.payment_type) {
       case PaymentTypes.CASH:
-        payload.tip = tip;
         break;
       case PaymentTypes.CREDIT:
+        if (tip) payload.tip = tip;
         payload.credit_card = this.formatCard();
         break;
       default:
