@@ -341,7 +341,7 @@ export default class Order {
       case PaymentTypes.CASH:
         break;
       case PaymentTypes.CREDIT:
-        payload.tip = tip;
+        if (tip) payload.tip = tip;
         payload.credit_card = this.formatCard();
         break;
       default:
