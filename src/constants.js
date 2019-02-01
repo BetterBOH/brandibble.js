@@ -3,4 +3,9 @@ const ServiceTypes = {
   DELIVERY: 'delivery',
 };
 
-export default { ServiceTypes };
+const OrderTypes = {
+  ONLINE_ORDERING: 'olo',
+  CATERING: 'catering'
+};
+
+export default { ServiceTypes, OrderTypes };
