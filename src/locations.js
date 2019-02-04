@@ -15,7 +15,7 @@ export default class Locations {
     return this.adapter.request('GET', 'locations');
   }
 
-  show(locationId, lat, lng, serviceType, requestedAt) {
+  show(locationId, lat, lng, serviceType, requestedAt, includeTimes) {
     let formattedRequestedAt;
 
     if (requestedAt) {
@@ -29,6 +29,7 @@ export default class Locations {
       !!lng && { longitude: lng },
       !!serviceType && { service_type: serviceType },
       !!formattedRequestedAt && { requested_at: formattedRequestedAt },
+      !!includeTimes && { include_times: includeTimes },
     );
 
     if (Object.keys(queryParamObject).length) {
