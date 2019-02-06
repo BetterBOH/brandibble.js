@@ -172,7 +172,7 @@ export default class Order {
         return this.adapter.persistCurrentOrder(this);
       }
       default:
-        this.miscOptions.tip = parseFloat(tip);
+        if (tip) this.miscOptions.tip = parseFloat(tip);
         return this.adapter.persistCurrentOrder(this);
     }
   }
