@@ -105,6 +105,20 @@ describe('Locations', () => {
       });
   });
 
+  it('can accept a queryObject as a second argument', () => {
+    const locationId = 19;
+
+    const queryObject = {
+      service_type: 'pickup',
+      requested_at: `${new Date().toISOString().split('.')[0]}Z`,
+    };
+
+    return Brandibble.locations.show(locationId, queryObject).then((response) => {
+      const data = shouldSucceed(response);
+      expect(data).to.be.an('object');
+    });
+  });
+
   it('can show all locations if passed valid lat and lng', () => {
     return Brandibble.locations.index(LAT_LNG).then((response) => {
       const data = shouldSucceed(response);
