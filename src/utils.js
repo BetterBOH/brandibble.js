@@ -10,6 +10,16 @@ function dasherize(str) {
     .toLowerCase();
 }
 
+// Validate returns undefined
+// If there are no validation errors
+// otherwise it returns an object
+export function isInvalidISOString(date) {
+  return validate(
+    { timestamp: date },
+    { timestamp: { format: ISO8601_PATTERN } },
+  );
+}
+
 export function queryStringBuilder(queryObject = {}) {
   return Object.keys(queryObject)
     .map((k) => {
@@ -148,15 +158,7 @@ export const coerceDateToISO8601 = (date) => {
     return `${date.toISOString().split('.')[0]}Z`;
   }
 
-  // Validate returns undefined
-  // If there are no validation errors
-  // otherwise it returns an object
-  const isInvalidISOString = validate(
-    { timestamp: date },
-    { timestamp: { format: ISO8601_PATTERN } },
-  );
-
-  if (!isInvalidISOString) {
+  if (!isInvalidISOString(date)) {
     return date;
   }
 

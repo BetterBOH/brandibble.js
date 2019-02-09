@@ -14,24 +14,52 @@ import Images from './images';
 import Order from './models/order';
 import LineItem from './models/lineItem';
 import Constants from './constants';
+
+import BrandibbleDateFactory from './lib/BrandibbleDateFactory';
 import { applyPollyfills, TestCreditCards } from './utils';
 
 applyPollyfills();
 
 class Storage {
-  config() { return this; }
-  static setItem() { return Promise.resolve(); }
-  static getItem() { return Promise.resolve(); }
-  static removeItem() { return Promise.resolve(); }
-  static clear() { return Promise.resolve(); }
+  config() {
+    return this;
+  }
+  static setItem() {
+    return Promise.resolve();
+  }
+  static getItem() {
+    return Promise.resolve();
+  }
+  static removeItem() {
+    return Promise.resolve();
+  }
+  static clear() {
+    return Promise.resolve();
+  }
 }
 
 export { Constants };
 
 export default class Brandibble {
-  constructor({ apiKey, brandId, apiEndpoint = null, apiVersion = null, origin = null, storage = null, requestTimeout = null }) {
-    if (!apiKey) { throw new Error('Brandibble.js: Please pass apiKey to the constructor options.'); }
-    if (!brandId) { throw new Error('Brandibble.js: Please pass brandId to the constructor options.'); }
+  constructor({
+    apiKey,
+    brandId,
+    apiEndpoint = null,
+    apiVersion = null,
+    origin = null,
+    storage = null,
+    requestTimeout = null,
+  }) {
+    if (!apiKey) {
+      throw new Error(
+        'Brandibble.js: Please pass apiKey to the constructor options.',
+      );
+    }
+    if (!brandId) {
+      throw new Error(
+        'Brandibble.js: Please pass brandId to the constructor options.',
+      );
+    }
 
     const _apiEndpoint = apiEndpoint || 'https://www.brandibble.co/api/';
     const _apiVersion = apiVersion || 'v1';
@@ -41,12 +69,19 @@ export default class Brandibble {
     const apiBase = `${_apiEndpoint}${_apiVersion}/brands/${brandId}/`;
 
     /* Build adapter */
-    this.adapter = new Adapter({ apiKey, apiBase, origin, storage: _storage, requestTimeout: _requestTimeout });
+    this.adapter = new Adapter({
+      apiKey,
+      apiBase,
+      origin,
+      storage: _storage,
+      requestTimeout: _requestTimeout,
+    });
     this.events = new Events();
 
     /* Build Resources */
     this.Order = Order;
     this.LineItem = LineItem;
+    this.DateTime = BrandibbleDateFactory;
 
     /* Build Resources */
     this.customers = new Customers(this.adapter, this.events);
