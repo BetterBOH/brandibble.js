@@ -21,7 +21,7 @@ export default {
         'transform-class-properties',
         'transform-object-rest-spread',
         'external-helpers',
-        'plugin-transform-object-assign',
+        '@babel/plugin-transform-object-assign',
       ],
       exclude: 'node_modules/**',
     }),
