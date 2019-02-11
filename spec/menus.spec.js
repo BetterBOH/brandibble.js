@@ -1,5 +1,4 @@
 /* global Brandibble expect it describe before */
-// import moment from 'moment-timezone';
 import { shouldSucceed, shouldError } from './helpers';
 
 describe('Menus', () => {
