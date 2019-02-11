@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import { isInvalidISOString } from '../utils';
 
 class BrandibbleDate {
