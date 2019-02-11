@@ -8,7 +8,7 @@ import {
   TestingAddress,
   UnsecureApiKey,
 } from './helpers';
-import { applyPolyfills } from '../src/utils';
+import { applyPollyfills } from '../src/utils';
 
 const { email, password } = TestingUser;
 
@@ -34,7 +34,7 @@ function ensureOrdersTestingUserExists() {
 }
 
 before(async () => {
-  applyPolyfills();
+  applyPollyfills();
   // Setup a Brandibble Ref, and add it to the Window
   const BrandibbleRef = await new Brandibble({
     apiKey: UnsecureApiKey,
