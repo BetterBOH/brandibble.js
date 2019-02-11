@@ -17,7 +17,12 @@ export default {
     babel({
       babelrc: false,
       presets: [['env', { modules: false }]],
-      plugins: ['transform-class-properties', 'transform-object-rest-spread', 'external-helpers'],
+      plugins: [
+        'transform-class-properties',
+        'transform-object-rest-spread',
+        'external-helpers',
+        'plugin-transform-object-assign',
+      ],
       exclude: 'node_modules/**',
     }),
   ],
