@@ -1,20 +1,32 @@
 /* global window before */
 import localforage from 'localforage';
 import Brandibble from '../src/brandibble';
-import { shouldSucceed, TestingUser, OrdersTestingUser, TestingAddress, UnsecureApiKey } from './helpers';
+import {
+  shouldSucceed,
+  TestingUser,
+  OrdersTestingUser,
+  TestingAddress,
+  UnsecureApiKey,
+} from './helpers';
+import { applyPolyfills } from '../src/utils';
 
 const { email, password } = TestingUser;
 
 localforage.config({ name: 'brandibble-test', storeName: 'brandibble-test' });
 
 function ensureCustomerResourcesExist() {
-  return window.Brandibble.customers.authenticate({ email, password }).then(() => {
-    return window.Brandibble.addresses.all().then((response) => {
-      const addresses = shouldSucceed(response);
-      if (addresses.length === 0) { return window.Brandibble.addresses.create(TestingAddress); }
-      return addresses[0];
-    });
-  }).catch(error => console.log(error));
+  return window.Brandibble.customers
+    .authenticate({ email, password })
+    .then(() => {
+      return window.Brandibble.addresses.all().then((response) => {
+        const addresses = shouldSucceed(response);
+        if (addresses.length === 0) {
+          return window.Brandibble.addresses.create(TestingAddress);
+        }
+        return addresses[0];
+      });
+    })
+    .catch(error => console.log(error));
 }
 
 function ensureOrdersTestingUserExists() {
@@ -22,6 +34,7 @@ function ensureOrdersTestingUserExists() {
 }
 
 before(async () => {
+  applyPolyfills();
   // Setup a Brandibble Ref, and add it to the Window
   const BrandibbleRef = await new Brandibble({
     apiKey: UnsecureApiKey,
@@ -32,7 +45,8 @@ before(async () => {
 
   return BrandibbleRef.setup().then((brandibble) => {
     window.Brandibble = brandibble;
-    return brandibble.customers.create(TestingUser)
+    return brandibble.customers
+      .create(TestingUser)
       .then(ensureCustomerResourcesExist, ensureCustomerResourcesExist)
       .then(ensureOrdersTestingUserExists, ensureOrdersTestingUserExists);
   });
