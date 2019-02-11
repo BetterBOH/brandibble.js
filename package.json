@@ -31,8 +31,7 @@
     "lodash.reject": "^4.6.0",
     "lodash.reverse": "^4.0.1",
     "lodash.sortby": "^4.7.0",
-    "moment": "^2.17.1",
-    "moment-timezone": "^0.5.10",
+    "luxon": "^1.11.2",
     "validate.js": "^0.10.0"
   },
   "devDependencies": {
