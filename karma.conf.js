@@ -8,6 +8,7 @@ module.exports = (config) => {
     singleRun: !!process.env.CI,
     frameworks: ['mocha', 'chai'],
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'spec/**/*.spec.js',
     ],
     plugins: [
