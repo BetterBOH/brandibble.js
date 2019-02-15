@@ -8,6 +8,6 @@ export default class Brands {
   }
 
   show() {
-    return this.adapter.request('GET', null, null);
+    return this.adapter.request('GET');
   }
 };
