@@ -14,7 +14,7 @@ describe('Brandibble', () => {
       'https://staging.brandibble.co/api/v1/brands/6/',
     );
   });
-
+  
   describe('sendSupportTicket', () => {
     it('can create support ticket', () => {
       return Brandibble.sendSupportTicket({
