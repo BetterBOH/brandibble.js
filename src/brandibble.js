@@ -1,5 +1,6 @@
 import Adapter from './adapter';
 import Events from './events';
+import Brands from './brands';
 import Customers from './customers';
 import Locations from './locations';
 import Addresses from './addresses';
@@ -49,6 +50,7 @@ export default class Brandibble {
     this.LineItem = LineItem;
 
     /* Build Resources */
+    this.brands = new Brands(this.adapter);
     this.customers = new Customers(this.adapter, this.events);
     this.locations = new Locations(this.adapter);
     this.addresses = new Addresses(this.adapter);

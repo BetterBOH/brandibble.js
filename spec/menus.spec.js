@@ -1,5 +1,5 @@
 /* global Brandibble expect it describe before */
-import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 import { shouldSucceed, shouldError } from './helpers';
 
 describe('Menus', () => {
@@ -17,32 +17,44 @@ describe('Menus', () => {
     it('can build a menu for a location', () => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
-      return Brandibble.menus.build(data[0].location_id, 'pickup').then((res) => {
-        data = shouldSucceed(res);
-        expect(data).to.be.a('object');
-      }).catch(error => console.log(error.errors[0].code));
+      return Brandibble.menus
+        .build(data[0].location_id, 'pickup')
+        .then((res) => {
+          data = shouldSucceed(res);
+          expect(data).to.be.a('object');
+        })
+        .catch(error => console.log(error.errors[0].code));
     });
 
     it('can build a menu for a location for a specific time', () => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
       let date = new Date();
-      date = moment(date).tz('America/New_York').toDate();
+      date = DateTime.fromJSDate(date)
+        .setZone('America/New_York')
+        .toJSDate();
       date.setDate(date.getDate() + 1);
-      return Brandibble.menus.build(19, 'delivery', date).then((res) => {
-        data = shouldSucceed(res);
-        expect(data).to.be.a('object').to.have.property('daypart');
-      }).catch(console.log);
+      return Brandibble.menus
+        .build(19, 'delivery', date)
+        .then((res) => {
+          data = shouldSucceed(res);
+          expect(data)
+            .to.be.a('object')
+            .to.have.property('daypart');
+        })
+        .catch(console.log);
     });
 
     it('can not build a menu for a location when the service in not enabled', () => {
       let data = shouldSucceed(response);
       expect(data).to.be.a('array');
-      return Brandibble.menus.build(data[0].location_id, 'delivery').catch((res) => {
-        data = shouldError(res);
-        expect(data).to.be.a('array');
-        expect(data[0].code).to.equal('menus.show.not_found');
-      });
+      return Brandibble.menus
+        .build(data[0].location_id, 'delivery')
+        .catch((res) => {
+          data = shouldError(res);
+          expect(data).to.be.a('array');
+          expect(data[0].code).to.equal('menus.show.not_found');
+        });
     });
   });
 
