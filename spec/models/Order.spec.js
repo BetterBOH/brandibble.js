@@ -226,6 +226,16 @@ describe('models/order', () => {
     });
   });
 
+  it('can reset tip', () => {
+    const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'delivery');
+    return newOrder.setTip('credit', 2.50).then(() => {
+      expect(newOrder.miscOptions.tip).to.deep.equal(2.50);
+      return newOrder.resetTip().then(() => {
+        expect(newOrder.miscOptions.tip).to.equal(null);
+      });
+    });
+  });
+
   it('can set payment method to levelup', () => {
     const newOrder = new Brandibble.Order(Brandibble.adapter, locationJSON.location_id, 'pickup');
     return newOrder.setPaymentMethod(PaymentTypes.LEVELUP).then(() => {
