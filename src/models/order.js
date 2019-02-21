@@ -15,7 +15,7 @@ import {
 const defaultOptions = {
   include_utensils: true,
   notes_for_store: '',
-  tip: 0,
+  tip: null,
   promo_code: '',
 };
 
@@ -175,6 +175,11 @@ export default class Order {
         if (tip) this.miscOptions.tip = parseFloat(tip);
         return this.adapter.persistCurrentOrder(this);
     }
+  }
+
+  resetTip() {
+    this.miscOptions.tip = null;
+    return this.adapter.persistCurrentOrder(this);
   }
 
   setAddress(address) {
