@@ -11,7 +11,6 @@ import {
   validateCard,
 } from './validations';
 
-
 const defaultOptions = {
   include_utensils: true,
   notes_for_store: '',
@@ -27,7 +26,13 @@ const serviceTypes = {
 const ASAP_STRING = 'asap';
 
 export default class Order {
-  constructor(adapter, location_id, serviceType = serviceTypes.DELIVERY, paymentType = null, miscOptions = defaultOptions) {
+  constructor(
+    adapter,
+    location_id,
+    serviceType = serviceTypes.DELIVERY,
+    paymentType = null,
+    miscOptions = defaultOptions,
+  ) {
     this.uuid = generateUUID();
     this.adapter = adapter;
     this.cart = new Cart();
@@ -49,7 +54,14 @@ export default class Order {
 
   rehydrateCart(serializedCart = {}) {
     (serializedCart.lineItems || []).forEach((serializedLineItem) => {
-      const { product, quantity, madeFor, instructions, configuration, uuid } = serializedLineItem;
+      const {
+        product,
+        quantity,
+        madeFor,
+        instructions,
+        configuration,
+        uuid,
+      } = serializedLineItem;
       /* Important: add directly from cart to avoid new writes to localforage */
       const lineItem = this.cart.addLineItem(product, quantity, uuid);
       lineItem.madeFor = madeFor;
@@ -61,7 +73,7 @@ export default class Order {
   }
 
   setRequestedAt(timestampOrAsap = ASAP_STRING, userWantsFutureOrder = false) {
-    if (typeof (userWantsFutureOrder) !== 'boolean') {
+    if (typeof userWantsFutureOrder !== 'boolean') {
       throw new Error(
         'Brandibble.js: You must pass a boolean as the second argument (`userWantsFutureOrder`) to `Order#setRequestedAt`.',
       );
@@ -72,11 +84,15 @@ export default class Order {
           'Brandibble.js: You can not pass `true` for `userWantsFutureOrder` when setting the Order#requested_at to `asap`.',
         );
       }
+      this.wantsFutureOrder = userWantsFutureOrder;
       this.requestedAt = ASAP_STRING;
       return this.adapter.persistCurrentOrder(this);
     }
 
-    const result = validate({ timestamp: timestampOrAsap }, { timestamp: { format: ISO8601_PATTERN } });
+    const result = validate(
+      { timestamp: timestampOrAsap },
+      { timestamp: { format: ISO8601_PATTERN } },
+    );
     if (!result) {
       this.wantsFutureOrder = userWantsFutureOrder;
       this.requestedAt = timestampOrAsap;
@@ -110,13 +126,21 @@ export default class Order {
   }
 
   addAppliedDiscount(newDiscount) {
-    const discountExists = find(this.discountsApplied, appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id);
-    if (!discountExists) this.discountsApplied.push({ discount_id: newDiscount.discount_id });
+    const discountExists = find(
+      this.discountsApplied,
+      appliedDiscount => appliedDiscount.discount_id === newDiscount.discount_id,
+    );
+    if (!discountExists) {
+      this.discountsApplied.push({ discount_id: newDiscount.discount_id });
+    }
     return this.adapter.persistCurrentOrder(this);
   }
 
   removeAppliedDiscount(newDiscount) {
-    this.discountsApplied = filter(this.discountsApplied, (appliedDiscount) => appliedDiscount.discount_id !== newDiscount.discount_id);
+    this.discountsApplied = filter(
+      this.discountsApplied,
+      appliedDiscount => appliedDiscount.discount_id !== newDiscount.discount_id,
+    );
     return this.adapter.persistCurrentOrder(this);
   }
 
@@ -131,7 +155,7 @@ export default class Order {
       switch (paymentType) {
         case PaymentTypes.CASH: {
           const { tip } = cardOrCashTip;
-          this.miscOptions.tip = (tip || 0);
+          this.miscOptions.tip = tip || 0;
           return this.adapter.persistCurrentOrder(this);
         }
         case PaymentTypes.LEVELUP: {
@@ -159,7 +183,7 @@ export default class Order {
           return Promise.reject(result);
         }
         default:
-          // do nothing
+        // do nothing
       }
     });
   }
@@ -218,7 +242,9 @@ export default class Order {
       this.cart.lineItems.push(lineItem);
       return this.adapter.persistCurrentOrder(this).then(() => lineItem);
     }
-    return Promise.reject('Must pass an instance of the Brandibble.LineItem model.');
+    return Promise.reject(
+      'Must pass an instance of the Brandibble.LineItem model.',
+    );
   }
 
   addLineItem(...args) {
@@ -260,7 +286,9 @@ export default class Order {
 
   removeLineItem(...args) {
     const remainingLineItems = this.cart.removeLineItem(...args);
-    return this.adapter.persistCurrentOrder(this).then(() => remainingLineItems);
+    return this.adapter
+      .persistCurrentOrder(this)
+      .then(() => remainingLineItems);
   }
 
   formatForValidation() {
@@ -275,17 +303,25 @@ export default class Order {
   }
 
   formatCustomer() {
-    if (!this.customer) { return {}; }
-    if (this.customer.customer_id) { return { customer_id: this.customer.customer_id }; }
-    return Object.keys(customerValidations)
-      .reduce((acc, curr) => ({
+    if (!this.customer) {
+      return {};
+    }
+    if (this.customer.customer_id) {
+      return { customer_id: this.customer.customer_id };
+    }
+    return Object.keys(customerValidations).reduce(
+      (acc, curr) => ({
         ...acc,
         [curr]: this.customer[curr],
-      }), {});
+      }),
+      {},
+    );
   }
 
   formatAddress() {
-    if (!this.address) { return {}; }
+    if (!this.address) {
+      return {};
+    }
     const {
       customer_address_id,
       city,
@@ -299,7 +335,9 @@ export default class Order {
       contact_name,
       contact_phone,
     } = this.address;
-    if (customer_address_id) { return { customer_address_id }; }
+    if (customer_address_id) {
+      return { customer_address_id };
+    }
     return {
       city,
       longitude,
@@ -315,14 +353,29 @@ export default class Order {
   }
 
   formatCard() {
-    if (!this.creditCard) { return {}; }
-    const { customer_card_id, cc_expiration, cc_number, cc_zip, cc_cvv } = this.creditCard;
-    if (customer_card_id) { return { customer_card_id }; }
+    if (!this.creditCard) {
+      return {};
+    }
+    const {
+      customer_card_id,
+      cc_expiration,
+      cc_number,
+      cc_zip,
+      cc_cvv,
+    } = this.creditCard;
+    if (customer_card_id) {
+      return { customer_card_id };
+    }
     return { cc_expiration, cc_number, cc_zip, cc_cvv };
   }
 
   format() {
-    const { include_utensils, notes_for_store, tip, promo_code } = this.miscOptions;
+    const {
+      include_utensils,
+      notes_for_store,
+      tip,
+      promo_code,
+    } = this.miscOptions;
 
     const payload = {
       uuid: this.uuid,
@@ -335,7 +388,7 @@ export default class Order {
       notes_for_store,
       promo_code,
       payment_type: this.paymentType,
-      discounts_applied: this.discountsApplied
+      discounts_applied: this.discountsApplied,
     };
 
     if (this.serviceType === serviceTypes.DELIVERY) {

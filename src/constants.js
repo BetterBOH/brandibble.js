@@ -5,7 +5,7 @@ const ServiceTypes = {
 
 const OrderTypes = {
   ONLINE_ORDERING: 'olo',
-  CATERING: 'catering'
+  CATERING: 'catering',
 };
 
 export default { ServiceTypes, OrderTypes };
