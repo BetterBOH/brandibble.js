@@ -168,6 +168,6 @@ export const coerceDateToISO8601 = (date) => {
 
 /**
  * Utils for export
- * should be added here
+ * can be added here
  */
 export default { coerceDateToISO8601 };
