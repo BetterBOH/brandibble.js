@@ -1,7 +1,0 @@
-machine:
-  timezone: America/New_York
-  node:
-    version: 7.6.0
-
-  post:
-    - npm install -g npm@4.3.0

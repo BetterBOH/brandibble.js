@@ -1,0 +1,28 @@
+version: 2
+
+jobs:
+  run-tests:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package-lock.json" }}
+          - v1-dependencies-
+      - run:
+          name: Install Dependencies
+          command: npm install 
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+      - run:
+          name: Run Tests
+          command: npm test
+
+workflows:
+  version: 2
+  run-tests:
+    jobs:
+      - run-tests 

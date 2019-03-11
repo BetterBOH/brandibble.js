@@ -16,13 +16,14 @@ export default {
   logo: null,
   map_marker: "//s3.amazonaws.com/betterboh/u/img/prod/6/1519329777_DigFlag_Black.png",
   name: "Dig Inn",
+  og_image: null,
   order_types: {
     catering: [
       "pickup",
       "delivery",
       "walkin"
     ],
-    merch:[
+    merch: [
       "pickup",
       "delivery",
       "walkin"
