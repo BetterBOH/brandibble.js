@@ -165,3 +165,9 @@ export const coerceDateToISO8601 = (date) => {
       'A UTC timestamp in ISO 8601 format must be provided, e.g. "2016-06-15T14:36:00Z"',
   });
 };
+
+/**
+ * Utils for export
+ * can be added here
+ */
+export default { coerceDateToISO8601 };
