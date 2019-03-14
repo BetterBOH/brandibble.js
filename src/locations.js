@@ -5,7 +5,7 @@ export default class Locations {
     this.adapter = adapter;
   }
 
-  index(queryParamObject) {
+  index(queryParamObject = { include_times: true }) {
     if (queryParamObject) {
       return this.adapter.request(
         'GET',
@@ -15,7 +15,7 @@ export default class Locations {
     return this.adapter.request('GET', 'locations');
   }
 
-  show(locationId, lat, lng, serviceType, requestedAt, includeTimes) {
+  show(locationId, lat, lng, serviceType, requestedAt, includeTimes = true) {
     /**
      * If the second arg passed in (lat) is an object
      * we can assume a queryObject was passed (preferred)
