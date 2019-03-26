@@ -8,7 +8,9 @@ import reduce from 'lodash.reduce';
 import validate from 'validate.js';
 import { validateProduct } from './validations';
 import { generateUUID } from '../utils';
-import { OptionOperations, OptionStatus } from '../constants';
+import Constants from '../constants';
+
+const { OptionOperations, OptionStatus } = Constants;
 
 export default class LineItem {
   constructor(product, quantity = 1, uuid) {
