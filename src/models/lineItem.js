@@ -8,16 +8,9 @@ import reduce from 'lodash.reduce';
 import validate from 'validate.js';
 import { validateProduct } from './validations';
 import { generateUUID } from '../utils';
+import Constants from '../constants';
 
-const OptionOperations = {
-  ADD: 'ADD',
-  REMOVE: 'REMOVE',
-};
-
-const OptionStatus = {
-  ABSENT: 'ABSENT',
-  PRESENT: 'PRESENT',
-};
+const { OptionItemsOperations, OptionItemsStatus } = Constants;
 
 export default class LineItem {
   constructor(product, quantity = 1, uuid) {
@@ -193,19 +186,19 @@ export default class LineItem {
           /* Find all currently added options of the same id */
           const matchingOptionItems = configGroup ? filter(configGroup.optionItems, { id: option.id }) : [];
           const quantity = matchingOptionItems.length;
-          const presence = quantity > 0 ? OptionStatus.PRESENT : OptionStatus.ABSENT;
+          const presence = quantity > 0 ? OptionItemsStatus.PRESENT : OptionItemsStatus.ABSENT;
 
           /* Build the allowd Operations here */
           const allowedOperations = [];
           if (canAddMoreToThisGroup) {
             allowedOperations.push({
-              operation: OptionOperations.ADD,
+              operation: OptionItemsOperations.ADD,
               costPerOperation: extraOptionsWillIncurCost ? option.price : '0.00',
             });
           }
-          if (presence === OptionStatus.PRESENT) {
+          if (presence === OptionItemsStatus.PRESENT) {
             allowedOperations.push({
-              operation: OptionOperations.REMOVE,
+              operation: OptionItemsOperations.REMOVE,
               costPerOperation: '0.00', /* Overriden Later in Pricing Loop */
             });
           }
@@ -230,7 +223,7 @@ export default class LineItem {
       if (_operationMap.additionalOptionsCount === 0) { return; }
 
       /* Additional Options are selected, so sort the optionItems array to find the most expensive */
-      const presentItems = filter(_operationMap.optionItems, i => i.presence === OptionStatus.PRESENT);
+      const presentItems = filter(_operationMap.optionItems, i => i.presence === OptionItemsStatus.PRESENT);
       const mostExpensivePresentOptionItems = reverse(sortBy(presentItems, i => parseFloat(i.costPerUnit)));
 
       /* Now work backwards from most expensive and attribute item to price */
@@ -241,7 +234,7 @@ export default class LineItem {
         if (catchupRequired >= _item.quantity) {
           _item.effectOnPrice = (parseFloat(_item.costPerUnit) * _item.quantity).toFixed(2);
           _item.quantityContributingToPrice = _item.quantity;
-          const removalOperation = find(_item.allowedOperations, o => o.operation === OptionOperations.REMOVE);
+          const removalOperation = find(_item.allowedOperations, o => o.operation === OptionItemsOperations.REMOVE);
           removalOperation.costPerOperation = _item.costPerUnit;
           catchup += _item.quantity;
         } else {
