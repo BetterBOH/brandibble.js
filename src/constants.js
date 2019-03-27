@@ -8,14 +8,14 @@ const OrderTypes = {
   CATERING: 'catering',
 };
 
-const OptionOperations = {
+const OptionItemsOperations = {
   ADD: 'ADD',
   REMOVE: 'REMOVE',
 };
 
-const OptionStatus = {
+const OptionItemsStatus = {
   ABSENT: 'ABSENT',
   PRESENT: 'PRESENT',
 };
 
-export default { ServiceTypes, OrderTypes, OptionOperations, OptionStatus };
+export default { ServiceTypes, OrderTypes, OptionItemsOperations, OptionItemsStatus };
