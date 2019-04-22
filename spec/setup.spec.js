@@ -8,6 +8,7 @@ const { email, password } = TestingUser;
 localforage.config({ name: 'brandibble-test', storeName: 'brandibble-test' });
 
 function ensureCustomerResourcesExist() {
+  console.log('will ensure')
   return window.Brandibble.customers.authenticate({ email, password }).then(() => {
     return window.Brandibble.addresses.all().then((response) => {
       const addresses = shouldSucceed(response);
