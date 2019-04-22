@@ -16,10 +16,10 @@ describe('Adapter', () => {
     Brandibble.adapter.apiBase = 'http://httpstat.us/';
     Brandibble.adapter.apiKey = null;
     return Brandibble.adapter.request('GET', '200/cors').catch((error) => {
+      
       Brandibble.adapter.apiBase =
         'https://staging.brandibble.co/api/v1/brands/6/';
       Brandibble.adapter.apiKey = UnsecureApiKey;
-      
       expect(error.response).to.present;
       expect(error.exception).to.present;
       expect(error.message).to.present;
