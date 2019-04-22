@@ -176,7 +176,8 @@ export default class Adapter {
   }
 
   request(method, path, body, { apiEndpoint, apiVersion, brandId } = {}) {
-    const apiBase = `${apiEndpoint || this.apiEndpoint}${apiVersion || this.apiVersion}/brands/${brandId || this.brandId}/`;
+    const apiEndpointWithVersion = `${apiEndpoint || this.apiEndpoint}${apiVersion || this.apiVersion}`;
+    const apiBase = `${apiEndpointWithVersion}${(brandId || this.brandId) ? `/brands/${(brandId || this.brandId)}/` : ''}`;
 
     if (this.requestTimeout) {
       return new Promise((resolve, reject) => {

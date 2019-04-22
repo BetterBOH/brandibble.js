@@ -10,8 +10,16 @@ describe('Brandibble', () => {
     const adapter = Brandibble.adapter;
     expect(adapter).to.have.property('apiKey', UnsecureApiKey);
     expect(adapter).to.have.property(
-      'apiBase',
-      'https://staging.brandibble.co/api/v1/brands/6/',
+      'apiEndpoint',
+      'https://staging.brandibble.co/api/',
+    );
+    expect(adapter).to.have.property(
+      'apiVersion',
+      'v1',
+    );
+    expect(adapter).to.have.property(
+      'brandId',
+      6,
     );
   });
 
