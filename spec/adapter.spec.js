@@ -13,17 +13,22 @@ describe('Adapter', () => {
   });
 
   it('throws a detailed exception when JSON parsing fails', () => {
-    Brandibble.adapter.apiBase = 'http://httpstat.us/';
+    Brandibble.adapter.apiEndpoint = 'http://httpstat.us/';
     Brandibble.adapter.apiKey = null;
+    Brandibble.adapter.apiVersion = '';
+    Brandibble.adapter.brandId = null;
+
     return Brandibble.adapter.request('GET', '200/cors').catch((error) => {
-      Brandibble.adapter.apiBase =
-        'https://staging.brandibble.co/api/v1/brands/6/';
+      Brandibble.adapter.apiEndpoint = 'https://staging.brandibble.co/api/';
       Brandibble.adapter.apiKey = UnsecureApiKey;
-      expect(error.response).to.present;
-      expect(error.exception).to.present;
-      expect(error.message).to.present;
+      Brandibble.adapter.apiVersion = 'v1';
+      Brandibble.adapter.brandId = 6;
+
+      expect(error.response).to.be.present;
+      expect(error.exception).to.be.present;
+      expect(error.message).to.be.present;
       // Ensure we don't double catch ourselves
-      expect(error.exception.exception).to.not.present;
+      expect(error.exception.exception).to.not.be.present;
     });
   });
 

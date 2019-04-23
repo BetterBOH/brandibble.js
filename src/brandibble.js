@@ -65,12 +65,12 @@ export default class Brandibble {
     const _storage = storage || new Storage();
     const _requestTimeout = requestTimeout || false;
 
-    const apiBase = `${_apiEndpoint}${_apiVersion}/brands/${brandId}/`;
-
     /* Build adapter */
     this.adapter = new Adapter({
       apiKey,
-      apiBase,
+      apiEndpoint: _apiEndpoint,
+      apiVersion: _apiVersion,
+      brandId,
       origin,
       storage: _storage,
       requestTimeout: _requestTimeout,

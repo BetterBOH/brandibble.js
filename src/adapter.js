@@ -77,9 +77,11 @@ function handleResponse(response) {
 
 
 export default class Adapter {
-  constructor({ apiKey, apiBase, origin, storage, requestTimeout }) {
+  constructor({ apiKey, apiVersion, apiEndpoint, brandId, origin, storage, requestTimeout }) {
     this.apiKey = apiKey;
-    this.apiBase = apiBase;
+    this.apiVersion = apiVersion;
+    this.apiEndpoint = apiEndpoint;
+    this.brandId = brandId;
     this.origin = origin;
     this.storage = storage;
     this.requestTimeout = requestTimeout;
@@ -173,13 +175,16 @@ export default class Adapter {
     });
   }
 
-  request(method, path, body) {
+  request(method, path, body, { apiEndpoint, apiVersion, brandId } = {}) {
+    const apiEndpointWithVersion = `${apiEndpoint || this.apiEndpoint}${apiVersion || this.apiVersion}`;
+    const apiBase = `${apiEndpointWithVersion}${(brandId || this.brandId) ? `/brands/${(brandId || this.brandId)}/` : ''}`;
+
     if (this.requestTimeout) {
       return new Promise((resolve, reject) => {
         const timerId = setTimeout(() => {
           reject(new Error(`Brandibble.js: The ${method} request to ${path} timed out after ${this.requestTimeout}.`));
         }, this.requestTimeout);
-        fetch(`${this.apiBase}${path}`, {
+        fetch(`${apiBase}${path}`, {
           method,
           headers: this.headers(),
           body: body ? JSON.stringify(body) : null,
@@ -190,7 +195,7 @@ export default class Adapter {
         }).then(handleResponse).then(resolve, reject);
       });
     }
-    return fetch(`${this.apiBase}${path}`, {
+    return fetch(`${apiBase}${path}`, {
       method,
       headers: this.headers(),
       body: body ? JSON.stringify(body) : null,

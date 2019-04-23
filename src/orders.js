@@ -2,6 +2,7 @@ import find from 'lodash.find';
 import reduce from 'lodash.reduce';
 import Order from './models/order';
 import LineItem from './models/lineItem';
+import { extractAdapterOverrides } from './utils';
 
 export default class Orders {
   constructor(adapter, events) {
@@ -70,23 +71,23 @@ export default class Orders {
   }
 
   /* The only attrs testChanges accepts are location_id, service_type & requested_at  */
-  validateCart(orderObj, testChanges = {}) {
+  validateCart(orderObj, testChanges = {}, options = {}) {
     const body = orderObj.formatForValidation();
     /* Don't send staged password to validate endpoints */
     if (body.customer && body.customer.password) {
       delete body.customer.password;
     }
     Object.assign(body, testChanges);
-    return this.adapter.request('POST', 'cart/validate', body);
+    return this.adapter.request('POST', 'cart/validate', body, extractAdapterOverrides(options));
   }
 
-  validate(orderObj) {
+  validate(orderObj, options = {}) {
     const body = orderObj.format();
     /* Don't send staged password to validate endpoints */
     if (body.customer && body.customer.password) {
       delete body.customer.password;
     }
-    return this.adapter.request('POST', 'orders/validate', body);
+    return this.adapter.request('POST', 'orders/validate', body, extractAdapterOverrides(options));
   }
 
   submit(orderObj, options = {}) {

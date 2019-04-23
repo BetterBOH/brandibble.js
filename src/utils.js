@@ -95,6 +95,15 @@ export function applyPollyfills() {
   }
 }
 
+export const extractAdapterOverrides = options => {
+  options = options || {};
+  const adapterOverrides = {};
+  adapterOverrides.apiVersion = options.apiVersion;
+  adapterOverrides.apiEndpoint = options.apiEndpoint;
+  adapterOverrides.brandId = options.brandId;
+  return adapterOverrides;
+};
+
 export const TestCreditCards = {
   visa: [
     { response: 'approval', number: '4788250000121443' },
