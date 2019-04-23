@@ -95,7 +95,7 @@ export function applyPollyfills() {
   }
 }
 
-export const extractAdapaterOverrides = options => {
+export const extractAdapterOverrides = options => {
   options = options || {};
   const adapterOverrides = {};
   adapterOverrides.apiVersion = options.apiVersion;

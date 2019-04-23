@@ -2,7 +2,7 @@ import find from 'lodash.find';
 import reduce from 'lodash.reduce';
 import Order from './models/order';
 import LineItem from './models/lineItem';
-import { extractAdapaterOverrides } from './utils';
+import { extractAdapterOverrides } from './utils';
 
 export default class Orders {
   constructor(adapter, events) {
@@ -78,7 +78,7 @@ export default class Orders {
       delete body.customer.password;
     }
     Object.assign(body, testChanges);
-    return this.adapter.request('POST', 'cart/validate', body, extractAdapaterOverrides(options));
+    return this.adapter.request('POST', 'cart/validate', body, extractAdapterOverrides(options));
   }
 
   validate(orderObj, options = {}) {
@@ -87,7 +87,7 @@ export default class Orders {
     if (body.customer && body.customer.password) {
       delete body.customer.password;
     }
-    return this.adapter.request('POST', 'orders/validate', body, extractAdapaterOverrides(options));
+    return this.adapter.request('POST', 'orders/validate', body, extractAdapterOverrides(options));
   }
 
   submit(orderObj, options = {}) {
