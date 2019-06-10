@@ -1,5 +1,7 @@
 import find from 'lodash.find';
+import isEmpty from 'lodash.isempty';
 import LineItem from './models/lineItem';
+import { queryStringBuilder } from './utils';
 
 export default class Favorites {
   constructor(adapter) {
@@ -10,11 +12,14 @@ export default class Favorites {
     return this.constructor.buildLineItemOrphan(...args);
   }
 
-
   static buildLineItemOrphan(favorite, menuJSON) {
-    const menuSection = find(menuJSON, m => find(m.children, c => find(c.items, i => i.id === favorite.menu_item_id)));
+    const menuSection = find(menuJSON, m =>
+      find(m.children, c => find(c.items, i => i.id === favorite.menu_item_id)),
+    );
     if (!menuSection) return;
-    const menuChild = find(menuSection.children, c => find(c.items, i => i.id === favorite.menu_item_id));
+    const menuChild = find(menuSection.children, c =>
+      find(c.items, i => i.id === favorite.menu_item_id),
+    );
     const product = find(menuChild.items, i => i.id === favorite.menu_item_id);
     const lineItem = new LineItem(product);
     try {
@@ -22,7 +27,10 @@ export default class Favorites {
         const optionGroup = find(product.option_groups, og => og.id === fog.id);
         if (!optionGroup) throw new Error({ message: 'Option Group Missing' });
         fog.option_items.forEach((foi) => {
-          const optionItem = find(optionGroup.option_items, oi => oi.id === foi.id);
+          const optionItem = find(
+            optionGroup.option_items,
+            oi => oi.id === foi.id,
+          );
           if (!optionItem) throw new Error({ message: 'Option Item Missing' });
           lineItem.addOption(optionGroup, optionItem);
         });
@@ -33,8 +41,20 @@ export default class Favorites {
     return lineItem;
   }
 
-  all() {
-    return this.adapter.request('GET', `customers/${this.adapter.customerId()}/favorites`);
+  all(queryParamObject = { include_item_details: true }) {
+    if (!isEmpty(queryParamObject)) {
+      return this.adapter.request(
+        'GET',
+        `customers/${this.adapter.customerId()}/favorites?${queryStringBuilder(
+          queryParamObject,
+        )}`,
+      );
+    }
+
+    return this.adapter.request(
+      'GET',
+      `customers/${this.adapter.customerId()}/favorites`,
+    );
   }
 
   create(name = '', lineItemObj) {
@@ -42,7 +62,11 @@ export default class Favorites {
       name,
       menu_item_json: lineItemObj.formatForFavorites(),
     };
-    return this.adapter.request('POST', `customers/${this.adapter.customerId()}/favorites`, data);
+    return this.adapter.request(
+      'POST',
+      `customers/${this.adapter.customerId()}/favorites`,
+      data,
+    );
   }
 
   update(favId, name = '', lineItemObj) {
@@ -51,11 +75,19 @@ export default class Favorites {
       name,
       menu_item_json: lineItemObj.formatForFavorites(),
     };
-    return this.adapter.request('PUT', `customers/${this.adapter.customerId()}/favorites`, data);
+    return this.adapter.request(
+      'PUT',
+      `customers/${this.adapter.customerId()}/favorites`,
+      data,
+    );
   }
 
   delete(favId) {
     const data = { favorite_item_id: favId };
-    return this.adapter.request('DELETE', `customers/${this.adapter.customerId()}/favorites`, data);
+    return this.adapter.request(
+      'DELETE',
+      `customers/${this.adapter.customerId()}/favorites`,
+      data,
+    );
   }
 }
