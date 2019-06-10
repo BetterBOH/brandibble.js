@@ -3,6 +3,7 @@
 import find from 'lodash.find';
 import includes from 'lodash.includes';
 import { PaymentTypes } from '../src/utils';
+
 const TESTING_ORDER_LOCATION_NAME = 'Madison Park';
 
 export const TestingUser = {
@@ -37,12 +38,11 @@ export const TestingAddress = {
 export const UnsecureApiKey = process.env.BRANDIBBLE_API_KEY;
 
 export function seedEmail() {
-  return `sanctuary-testing-${(new Date()).valueOf().toString()}@example.com`;
+  return `sanctuary-testing-${new Date().valueOf().toString()}@example.com`;
 }
 
-
 export function seedText() {
-  return `Testing ${(new Date()).valueOf().toString()}`;
+  return `Testing ${new Date().valueOf().toString()}`;
 }
 
 export function shouldSucceed(response) {
@@ -57,13 +57,22 @@ export function shouldError(response) {
   return response.errors;
 }
 
-export async function configureTestingOrder(Brandibble, customer, address, cardOrCashTip) {
+export async function configureTestingOrder(
+  Brandibble,
+  customer,
+  address,
+  cardOrCashTip,
+  addRandomLineItem,
+) {
   let response = await Brandibble.locations.index();
   let data = shouldSucceed(response);
   expect(data).to.be.a('array');
 
   const serviceType = 'pickup';
-  const location = find(data, location => location.name === TESTING_ORDER_LOCATION_NAME);
+  const location = find(
+    data,
+    location => location.name === TESTING_ORDER_LOCATION_NAME,
+  );
   expect(location.name).to.equal(TESTING_ORDER_LOCATION_NAME);
 
   response = await Brandibble.menus.build(location.location_id, serviceType);
@@ -71,15 +80,26 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   expect(data).to.be.a('object');
   expect(data.menu).to.be.a('array');
 
-  const newOrder = await Brandibble.orders.create(location.location_id, serviceType);
+  const newOrder = await Brandibble.orders.create(
+    location.location_id,
+    serviceType,
+  );
 
   const market = find(data.menu, item => item.name === 'The Market');
-  const marketBowls = find(market.children, item => item.name === 'Marketbowls');
-  const product = find(marketBowls.items, item => item.name === 'Charred Chicken Marketbowl');
+  const marketBowls = find(
+    market.children,
+    item => item.name === 'Marketbowls',
+  );
+  const product = find(
+    marketBowls.items,
+    item => item.name === 'Charred Chicken Marketbowl',
+  );
 
   const soldOutItemIDs = data.sold_out_items;
   if (includes(soldOutItemIDs, product.id)) {
-    throw new Error('BrandibbleBackendConfig: Charred Chicken Marketbowl is Sold Out, tests can not run.');
+    throw new Error(
+      'BrandibbleBackendConfig: Charred Chicken Marketbowl is Sold Out, tests can not run.',
+    );
   }
 
   const lineItem = await newOrder.addLineItem(product, 1);
@@ -92,9 +112,19 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
   const sides = lineItem.optionGroups()[1];
 
   /* Load Available Sides & Bases */
-  const firstAvailableBase = find(bases.option_items, item => !includes(soldOutItemIDs, item.id));
-  const firstAvailableSide = find(sides.option_items, item => !includes(soldOutItemIDs, item.id));
-  const secondAvailableSide = find(sides.option_items, item => !includes(soldOutItemIDs, item.id) && item.id !== firstAvailableSide.id);
+  const firstAvailableBase = find(
+    bases.option_items,
+    item => !includes(soldOutItemIDs, item.id),
+  );
+  const firstAvailableSide = find(
+    sides.option_items,
+    item => !includes(soldOutItemIDs, item.id),
+  );
+  const secondAvailableSide = find(
+    sides.option_items,
+    item =>
+      !includes(soldOutItemIDs, item.id) && item.id !== firstAvailableSide.id,
+  );
 
   await Promise.all([
     newOrder.addOptionToLineItem(lineItem, bases, firstAvailableBase),
@@ -104,11 +134,36 @@ export async function configureTestingOrder(Brandibble, customer, address, cardO
 
   expect(lineItem.isValid()).to.equal(true);
   expect(newOrder.cart.isValid()).to.equal(true);
+
+  if (addRandomLineItem) {
+    const aLaCartSides = find(
+      data.menu,
+      item => item.name === 'A La Carte Sides',
+    );
+    const childrenWithItems = aLaCartSides.children.filter(
+      child => !!child.items.length,
+    );
+    const randomChild =
+      childrenWithItems[Math.floor(Math.random() * childrenWithItems.length)];
+    const randomItem =
+      randomChild.items[Math.floor(Math.random() * randomChild.items.length)];
+
+    await newOrder.addLineItem(randomItem, 1);
+  }
+
   const promises = [];
 
-  if (customer) { promises.push(newOrder.setCustomer(customer)); }
-  if (address) { promises.push(newOrder.setAddress(address)); }
-  if (cardOrCashTip) { promises.push(newOrder.setPaymentMethod(PaymentTypes.CREDIT, cardOrCashTip)); }
+  if (customer) {
+    promises.push(newOrder.setCustomer(customer));
+  }
+  if (address) {
+    promises.push(newOrder.setAddress(address));
+  }
+  if (cardOrCashTip) {
+    promises.push(
+      newOrder.setPaymentMethod(PaymentTypes.CREDIT, cardOrCashTip),
+    );
+  }
 
   await Promise.all(promises);
 

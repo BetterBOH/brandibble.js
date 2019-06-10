@@ -18,13 +18,18 @@ describe('Orders', () => {
 
     // TODO: We should use stored cards in this test eventually
     const card = {
-      cc_expiration: '0130',
-      cc_number: Brandibble.TestCreditCards.visa[0].number,
-      cc_zip: 12345,
-      cc_cvv: 123,
+      cc_expiration: '0260',
+      cc_number: Brandibble.TestCreditCards.mastercard[0].number,
+      cc_zip: 45678,
+      cc_cvv: 456,
     };
 
-    const testingOrder = await configureTestingOrder(Brandibble, customer, address, card);
+    const testingOrder = await configureTestingOrder(
+      Brandibble,
+      customer,
+      address,
+      card,
+    );
 
     response = await Brandibble.orders.submit(testingOrder);
 
@@ -32,30 +37,38 @@ describe('Orders', () => {
     expect(data).to.be.a('object');
   });
 
-  it('will not restore a credit card submitted in it\'s raw format from local storage', () => {
+  it("will not restore a credit card submitted in it's raw format from local storage", () => {
     const { email, password } = TestingUser;
-    return Brandibble.customers.authenticate({
-      email,
-      password,
-    }).then((response) => {
-      const customer = shouldSucceed(response);
-      return Brandibble.addresses.all().then((res) => {
-        const address = shouldSucceed(res)[0];
-        const card = {
-          cc_expiration: '0130',
-          cc_number: Brandibble.TestCreditCards.visa[0].number,
-          cc_zip: 12345,
-          cc_cvv: 123,
-        };
-        return configureTestingOrder(Brandibble, customer, address, card).then((order) => {
-          return Brandibble.adapter.persistCurrentOrder(order).then(() => {
-            return Brandibble.adapter.restoreCurrentOrder().then((retrievedOrder) => {
-              expect(retrievedOrder.creditCard).to.equal(null);
-              expect(retrievedOrder).to.be.an.instanceof(Brandibble.Order);
-            });
-          });
-        }).catch(error => console.log(error));
+    return Brandibble.customers
+      .authenticate({
+        email,
+        password,
+      })
+      .then((response) => {
+        const customer = shouldSucceed(response);
+        return Brandibble.addresses.all().then((res) => {
+          const address = shouldSucceed(res)[0];
+          const card = {
+            cc_expiration: '0130',
+            cc_number: Brandibble.TestCreditCards.visa[0].number,
+            cc_zip: 12345,
+            cc_cvv: 123,
+          };
+          return configureTestingOrder(Brandibble, customer, address, card)
+            .then((order) => {
+              return Brandibble.adapter.persistCurrentOrder(order).then(() => {
+                return Brandibble.adapter
+                  .restoreCurrentOrder()
+                  .then((retrievedOrder) => {
+                    expect(retrievedOrder.creditCard).to.equal(null);
+                    expect(retrievedOrder).to.be.an.instanceof(
+                      Brandibble.Order,
+                    );
+                  });
+              });
+            })
+            .catch(error => console.log(error));
+        });
       });
-    });
   });
 });

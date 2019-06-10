@@ -3,7 +3,10 @@
 import find from 'lodash.find';
 import productJSON from './stubs/product.stub';
 import menuStub from './stubs/menu.stub';
-import { validFavoriteForOrder, invalidFavoriteForOrder } from './stubs/favorite.stub';
+import {
+  validFavoriteForOrder,
+  invalidFavoriteForOrder,
+} from './stubs/favorite.stub';
 import { shouldSucceed, TestingUser } from './helpers';
 
 describe('Favorites', () => {
@@ -12,39 +15,51 @@ describe('Favorites', () => {
 
   before(() => {
     const { email, password } = TestingUser;
-    return Brandibble.customers.authenticate({
-      email,
-      password,
-    }).then(() => {
-      return Brandibble.locations.index().then((res) => {
-        const data = shouldSucceed(res);
-        return Brandibble.menus.build(data[0].location_id, 'pickup').then((response) => {
-          const { menu } = shouldSucceed(response);
-          expect(menu).to.be.an('array');
+    return Brandibble.customers
+      .authenticate({
+        email,
+        password,
+      })
+      .then(() => {
+        return Brandibble.locations.index().then((res) => {
+          const data = shouldSucceed(res);
+          return Brandibble.menus
+            .build(data[0].location_id, 'pickup')
+            .then((response) => {
+              const { menu } = shouldSucceed(response);
+              expect(menu).to.be.an('array');
 
-          const market = find(menu, item => item.name === 'The Market');
-          const marketBowls = find(market.children, item => item.name === 'Marketbowls');
-          const product = find(marketBowls.items, item => item.name === 'Charred Chicken Marketbowl');
-          expect(product.name).to.eq('Charred Chicken Marketbowl');
+              const market = find(menu, item => item.name === 'The Market');
+              const marketBowls = find(
+                market.children,
+                item => item.name === 'Marketbowls',
+              );
+              const product = find(
+                marketBowls.items,
+                item => item.name === 'Charred Chicken Marketbowl',
+              );
+              expect(product.name).to.eq('Charred Chicken Marketbowl');
 
-          lineItem = new Brandibble.LineItem(productJSON, 1);
-          const bases = lineItem.optionGroups()[0];
-          const sides = lineItem.optionGroups()[1];
-          lineItem.addOption(bases, bases.option_items[0]);
-          lineItem.addOption(sides, sides.option_items[0]);
-          lineItem.addOption(sides, sides.option_items[1]);
+              lineItem = new Brandibble.LineItem(productJSON, 1);
+              const bases = lineItem.optionGroups()[0];
+              const sides = lineItem.optionGroups()[1];
+              lineItem.addOption(bases, bases.option_items[0]);
+              lineItem.addOption(sides, sides.option_items[0]);
+              lineItem.addOption(sides, sides.option_items[1]);
+            });
         });
       });
-    });
   });
 
   describe('adds favorite', () => {
     let favorite;
 
     before(() => {
-      return Brandibble.favorites.create('my favorite', lineItem).then(({ data }) => {
-        favorite = data;
-      });
+      return Brandibble.favorites
+        .create('my favorite', lineItem)
+        .then(({ data }) => {
+          favorite = data;
+        });
     });
 
     it('should add customer favorite', () => {
@@ -61,19 +76,26 @@ describe('Favorites', () => {
       });
     });
 
-    it('should list all customer favorites', () => {
+    it('should list all customer favorites with items details', () => {
       expect(favorites).to.be.a('array');
     });
 
     it('should contain favorite objects', () => {
-      expect(favorites[0]).to.include.keys('name', 'favorite_item_id', 'menu_item_json');
+      expect(favorites[0]).to.include.keys(
+        'name',
+        'favorite_item_id',
+        'menu_item_json',
+      );
     });
   });
 
   describe('can build line item against valid menu', () => {
     let lineItemFromFavorite;
     before(() => {
-      lineItemFromFavorite = Brandibble.favorites.buildLineItemOrphan(validFavoriteForOrder, menuStub);
+      lineItemFromFavorite = Brandibble.favorites.buildLineItemOrphan(
+        validFavoriteForOrder,
+        menuStub,
+      );
     });
 
     it('should be a lineItem object', () => {
@@ -84,7 +106,10 @@ describe('Favorites', () => {
   describe('fails to build line item against menu', () => {
     let lineItemFromFavorite;
     before(() => {
-      lineItemFromFavorite = Brandibble.favorites.buildLineItemOrphan(invalidFavoriteForOrder, menuStub);
+      lineItemFromFavorite = Brandibble.favorites.buildLineItemOrphan(
+        invalidFavoriteForOrder,
+        menuStub,
+      );
     });
 
     it('lineItemFromFavorite should be undefined', () => {
@@ -99,9 +124,11 @@ describe('Favorites', () => {
     before(() => {
       return Brandibble.favorites.all().then(({ data }) => {
         favoriteId = data[0].favorite_item_id;
-        return Brandibble.favorites.update(favoriteId, 'new name', lineItem).then(({ data }) => {
-          updatedFavoriteId = data.favorite_item_id;
-        });
+        return Brandibble.favorites
+          .update(favoriteId, 'new name', lineItem)
+          .then(({ data }) => {
+            updatedFavoriteId = data.favorite_item_id;
+          });
       });
     });
 

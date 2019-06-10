@@ -22,17 +22,25 @@ describe('Ratings', () => {
 
       // TODO: We should use stored cards in this test eventually
       const card = {
-        cc_expiration: '0130',
-        cc_number: Brandibble.TestCreditCards.visa[0].number,
-        cc_zip: 12345,
+        cc_expiration: '0123',
+        cc_number: Brandibble.TestCreditCards.mastercard[0].number,
+        cc_zip: 10013,
         cc_cvv: 123,
       };
 
-      const testingOrder = await configureTestingOrder(Brandibble, customer, address, card);
+      const testingOrder = await configureTestingOrder(
+        Brandibble,
+        customer,
+        address,
+        card,
+        true, // Adds random item to order
+      );
       response = await Brandibble.orders.submit(testingOrder);
 
       orders_id = response.data.orders_id;
-      response = await Brandibble.ratings.create(orders_id, { rating: TEST_RATING });
+      response = await Brandibble.ratings.create(orders_id, {
+        rating: TEST_RATING,
+      });
     });
 
     it('should be able to create a rating for an order', () => {
@@ -46,7 +54,9 @@ describe('Ratings', () => {
       });
 
       it('should be able to update rating', async () => {
-        response = await Brandibble.ratings.update(orders_id, { rating: TEST_RATING + 1 });
+        response = await Brandibble.ratings.update(orders_id, {
+          rating: TEST_RATING + 1,
+        });
         expect(response.data.rating).to.equal(TEST_RATING + 1);
       });
 
