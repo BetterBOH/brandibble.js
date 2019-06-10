@@ -1,5 +1,5 @@
 import find from 'lodash.find';
-import isEmpty from 'lodash.isEmpty';
+import isEmpty from 'lodash.isempty';
 import LineItem from './models/lineItem';
 import { queryStringBuilder } from './utils';
 
